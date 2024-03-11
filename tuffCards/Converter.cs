@@ -60,17 +60,16 @@ public static class Converter {
 				using (var reader = new StreamReader(cardData)) {
 					try {
 						var headers = (await reader.ReadLineAsync()).Split(';');
-						string line;
-						while ((line = await reader.ReadLineAsync()) != null) {
+						while (await reader.ReadLineAsync() is {} line) {
 							var data = headers
 								.Zip(line.Split(';'), (header, row) => new { header, row })
 								.ToDictionary(x => x.header, x => parser.Parse(x.row));
-							var result = template.Render(data);
+							var result = await template.RenderAsync(data);
 							cards.Add(result);
 						}
 						var outputPath = Path.Combine(outputDirectory, $"{name}.html");
 						using var output = new StreamWriter(outputPath, false);
-						var outputResult = wrapperTemplate.Render(new { name, cards });
+						var outputResult = await wrapperTemplate.RenderAsync(new { name, cards });
 						Console.WriteLine($"... created {cards.Count} cards.");
 						await output.WriteLineAsync(outputResult);
 					}
@@ -78,7 +77,6 @@ public static class Converter {
 						Console.WriteLine($"Error parsing card data: {ex.Message}. Skipping.");
 					}
 				}
-
 			}
 			Console.WriteLine("Finished.");
 		}
