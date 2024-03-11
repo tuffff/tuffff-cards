@@ -1,0 +1,51 @@
+<div class="wrapper {{ name }}">{{ for card in cards }}
+	{{ card }}{{ end }}
+</div>
+
+<style>
+	.wrapper {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.actions > div {
+		height: 500px;
+		width: 200px;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		border-radius: 8px;
+		border: solid thin black;
+		background: linear-gradient(to bottom right, #220088, #880022);
+		color: white;
+		position: relative;
+
+		> .cost {
+			flex: 0 0 auto;
+			align-self: stretch;
+			background: rgba(0, 0, 0, 0.5);
+		}
+		> .effect {
+			flex: 1 0 auto;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			margin: 8px;
+		}
+		.image {
+			width: 184px;
+			margin: 8px;
+			flex: 1 0 auto;
+		}
+	}
+
+	.icon {
+		height: 16px;
+	}
+
+	p {
+		margin: 0;
+	}
+</style>

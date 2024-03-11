@@ -1,0 +1,6 @@
+<div>
+	<div>{{ Cost }}</div>
+	<div>
+		<div>{{ Effect }}</div>
+	</div>
+</div>

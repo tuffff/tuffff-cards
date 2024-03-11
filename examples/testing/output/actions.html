@@ -1,0 +1,69 @@
+<div class="wrapper actions">
+	<div>
+		<div class="cost"><p>1</p>
+	</div>
+		
+		<div class="effect">
+			<div><p>Do something</p>
+	</div>
+		</div>
+	</div>
+	<div>
+		<div class="cost"><p>2</p>
+	</div>
+		<p><img class="image" src="strong.png" alt="strong" /></p>
+	
+		<div class="effect">
+			<div><p><img class="icon" src="tap.png" alt="tap" />: Do something <em>really</em> <strong>strong</strong></p>
+	</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.wrapper {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.actions > div {
+		height: 500px;
+		width: 200px;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		border-radius: 8px;
+		border: solid thin black;
+		background: linear-gradient(to bottom right, #220088, #880022);
+		color: white;
+		position: relative;
+
+		> .cost {
+			flex: 0 0 auto;
+			align-self: stretch;
+			background: rgba(0, 0, 0, 0.5);
+		}
+		> .effect {
+			flex: 1 0 auto;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			margin: 8px;
+		}
+		.image {
+			width: 184px;
+			margin: 8px;
+			flex: 1 0 auto;
+		}
+	}
+
+	.icon {
+		height: 16px;
+	}
+
+	p {
+		margin: 0;
+	}
+</style>
