@@ -145,7 +145,7 @@ public static class Converter {
 						}
 					}
 					const string exe = """
-					                    C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
+					                    C:\Program Files\Google\Chrome\Application\chrome.exe
 					                    """;
 					var args = $"""
 								   --headless --screenshot="{Path.Combine(directory, imagePath)}" --window-size="{imageSize}" "{Path.Combine(directory, outputPath)}"
