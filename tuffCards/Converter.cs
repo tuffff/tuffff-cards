@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 namespace TuffCards;
 
 public static class Converter {
-	public static async Task Convert(string wrapper, bool screenshot) {
+	public static async Task Convert(string target, bool image) {
 		try {
 			var directory = new DirectoryInfo(Environment.CurrentDirectory).FullName;
-			var wrapperDirectory = Path.Combine(".", "wrappers");
+			var targetDirectory = Path.Combine(".", "targets");
 			var cardsDirectory = Path.Combine(".", "cards");
 			var outputRootDirectory = Path.Combine(".", "output");
-			var outputDirectory = Path.Combine(outputRootDirectory, wrapper);
+			var outputDirectory = Path.Combine(outputRootDirectory, target);
 			var iconDirectory = Path.Combine(".", "icons");
 			var imageDirectory = Path.Combine(".", "images");
 			var scriptsDirectory = Path.Combine(".", "scripts");
 
 			Log.Info($"Project directory: {directory}");
 
-			if (!Directory.Exists(wrapperDirectory)) throw new Exception("Directory '/wrappers' not found. Did you create a new project with 'tuffCards create'?");
+			if (!Directory.Exists(targetDirectory)) throw new Exception("Directory '/targets' not found. Did you create a new project with 'tuffCards create'?");
 			if (!Directory.Exists(cardsDirectory)) throw new Exception("Directory '/cards' not found. Did you create a new project with 'tuffCards create'?");
 			if (!Directory.Exists(outputRootDirectory)) Directory.CreateDirectory(outputDirectory);
 			if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
@@ -31,19 +31,19 @@ public static class Converter {
 			foreach (var file in outputDirectoryInfo.GetFiles()) file.Delete();
 			foreach (var dir in outputDirectoryInfo.GetDirectories()) dir.Delete(true);
 
-			var wrapperPath = Path.Combine(wrapperDirectory, $"{wrapper}.html");
-			if (!File.Exists(wrapperPath)) throw new Exception($"Wrapper file '{wrapper}' not found. (path: {wrapperPath})");
+			var targetPath = Path.Combine(targetDirectory, $"{target}.html");
+			if (!File.Exists(targetPath)) throw new Exception($"Target file '{target}' not found. (path: {targetPath})");
 
-			Log.Info($"Using wrapper template: {wrapperPath}");
-			string wrapperTemplateText;
-			Template wrapperTemplate;
+			Log.Info($"Using target template: {targetPath}");
+			string targetTemplateText;
+			Template targetTemplate;
 			try {
-				wrapperTemplateText = File.ReadAllText(wrapperPath);
-				wrapperTemplate = Template.Parse(wrapperTemplateText);
-				if (wrapperTemplate.HasErrors) throw new InvalidOperationException(wrapperTemplate.Messages.ToString());
+				targetTemplateText = File.ReadAllText(targetPath);
+				targetTemplate = Template.Parse(targetTemplateText);
+				if (targetTemplate.HasErrors) throw new InvalidOperationException(targetTemplate.Messages.ToString());
 			}
 			catch (Exception ex) {
-				throw new Exception($"Error parsing wrapper template: {ex.Message}");
+				throw new Exception($"Error parsing target template: {ex.Message}");
 			}
 
 			var parser = new MarkdownParser(iconDirectory, imageDirectory, outputDirectory);
@@ -61,7 +61,7 @@ public static class Converter {
 				try {
 					var templateText = File.ReadAllText(cardType.FullName);
 					template = Template.Parse(templateText);
-					if (wrapperTemplate.HasErrors) throw new InvalidOperationException(wrapperTemplate.Messages.ToString());
+					if (targetTemplate.HasErrors) throw new InvalidOperationException(targetTemplate.Messages.ToString());
 				}
 				catch (Exception ex) {
 					Log.Warning($"Error parsing card type template. Skipping. Message: {ex.Message}");
@@ -84,11 +84,11 @@ public static class Converter {
 					}
 				}
 
-				var cardtypecss = string.Empty;
+				var cardTypeCss = string.Empty;
 				var cssPath = Path.Combine(cardType.Directory.FullName, $"{name}.css");
 				if (File.Exists(cssPath)) {
 					try {
-						cardtypecss  = File.ReadAllText(cssPath);
+						cardTypeCss  = File.ReadAllText(cssPath);
 						Log.Info($"... Also added css for {name} ...");
 					}
 					catch (Exception ex) {
@@ -108,21 +108,21 @@ public static class Converter {
 					}
 				}
 
-				var globalwrappercss = string.Empty;
-				var globalWrapperCssPath = Path.Combine(wrapperDirectory, "global.css");
-				if (File.Exists(globalWrapperCssPath)) {
+				var globalTargetCss = string.Empty;
+				var globalTargetCssPath = Path.Combine(targetDirectory, "global.css");
+				if (File.Exists(globalTargetCssPath)) {
 					try {
-						globalwrappercss = File.ReadAllText(globalWrapperCssPath);
+						globalTargetCss = File.ReadAllText(globalTargetCssPath);
 					}
 					catch (Exception ex) {
-						Log.Error($"Adding global wrapper css: {ex.Message}. Skipping.");
+						Log.Error($"Adding global target css: {ex.Message}. Skipping.");
 					}
 				}
 
 				var outputPath = Path.Combine(outputDirectory, $"{name}.html");
 				try {
 					using var output = new StreamWriter(outputPath, false);
-					var outputResult = await wrapperTemplate.RenderAsync(new { name, cards, cardtypecss, globalwrappercss, scripts });
+					var outputResult = await targetTemplate.RenderAsync(new { name, cards, cardtypecss = cardTypeCss, globaltargetcss = globalTargetCss, scripts });
 					Log.Info($"... created {cards.Count} cards: {outputPath}");
 					await output.WriteLineAsync(outputResult);
 				}
@@ -130,25 +130,25 @@ public static class Converter {
 					Log.Error($"Wring output: {ex.Message}. Skipping.");
 				}
 
-				if (screenshot) {
-					Console.Write("Screenshot ... ");
-					var screenshotPath = Path.Combine(outputDirectory, $"{name}.png");
-					var screenshotSize = "1000,1000";
-					var match = Regex.Match(wrapperTemplateText, @$"<!-- screenshot-size-{name}:(\d+)x(\d+) -->");
+				if (image) {
+					Console.Write("Generating image ... ");
+					var imagePath = Path.Combine(outputDirectory, $"{name}.png");
+					var imageSize = "1000,1000";
+					var match = Regex.Match(targetTemplateText, @$"<!-- image-size-{name}:(\d+)x(\d+) -->");
 					if (match.Success) {
-						screenshotSize = $"{match.Groups[1].Value},{match.Groups[2].Value}";
+						imageSize = $"{match.Groups[1].Value},{match.Groups[2].Value}";
 					}
 					else {
-						match = Regex.Match(wrapperTemplateText, @$"<!-- screenshot-size:(\d+)x(\d+) -->");
+						match = Regex.Match(targetTemplateText, @$"<!-- image-size:(\d+)x(\d+) -->");
 						if (match.Success) {
-							screenshotSize = $"{match.Groups[1].Value},{match.Groups[2].Value}";
+							imageSize = $"{match.Groups[1].Value},{match.Groups[2].Value}";
 						}
 					}
 					const string exe = """
 					                    C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
 					                    """;
 					var args = $"""
-								   --headless --screenshot="{Path.Combine(directory, screenshotPath)}" --window-size="{screenshotSize}" "{Path.Combine(directory, outputPath)}"
+								   --headless --screenshot="{Path.Combine(directory, imagePath)}" --window-size="{imageSize}" "{Path.Combine(directory, outputPath)}"
 								   """;
 					try {
 						var pi = new ProcessStartInfo(exe, args) {
@@ -162,10 +162,10 @@ public static class Converter {
 							throw new Exception(await process?.StandardError.ReadToEndAsync()!);
 						}
 
-						Log.Info($"done: {screenshotPath}");
+						Log.Info($"done: {imagePath}");
 					}
 					catch (Exception ex) {
-						Log.Error($"Taking screenshot: {ex.Message}. Skipping. Command was: \"{exe}\" {args}");
+						Log.Error($"Generating image: {ex.Message}. Skipping. Command was: \"{exe}\" {args}");
 					}
 				}
 			}

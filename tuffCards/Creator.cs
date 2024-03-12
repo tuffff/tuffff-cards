@@ -12,11 +12,43 @@ public static class Creator {
 			if (!force && Directory.EnumerateFileSystemEntries(directory).Any())
 				throw new Exception("Current folder is not empty. Use --force to create anyway.");
 
-			var wrappersDir = Path.Combine(directory, "wrappers");
-			Directory.CreateDirectory(wrappersDir);
-			File.WriteAllText(Path.Combine(wrappersDir, "global.css"), Presets.GlobalWrapperCss);
-			File.WriteAllText(Path.Combine(wrappersDir, "default.html"), Presets.DefaultWrapper);
-			File.WriteAllText(Path.Combine(wrappersDir, "tts.html"), Presets.TtsWrapper);
+			var targetsDir = Path.Combine(directory, "targets");
+			Directory.CreateDirectory(targetsDir);
+			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.GlobalTargetCss);
+			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.DefaultTarget);
+
+			var cardsDir = Path.Combine(directory, "cards");
+			Directory.CreateDirectory(cardsDir);
+
+			var imagesDir = Path.Combine(directory, "images");
+			Directory.CreateDirectory(imagesDir);
+
+			var iconsDir = Path.Combine(directory, "icons");
+			Directory.CreateDirectory(iconsDir);
+
+			var scriptsDir = Path.Combine(directory, "scripts");
+			Directory.CreateDirectory(scriptsDir);
+			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.FitTextScript);
+
+			Log.Success("Project created. Run 'tuffCards add-type <name>' to add some cards.");
+		}
+		catch (Exception ex) {
+			Log.Error($"While creating: {ex.Message}");
+		}
+		return Task.CompletedTask;
+	}
+
+	public static Task CreateExample(bool force) {
+		try {
+			var directory = new DirectoryInfo(Environment.CurrentDirectory).FullName;
+			if (!force && Directory.EnumerateFileSystemEntries(directory).Any())
+				throw new Exception("Current folder is not empty. Use --force to create anyway.");
+
+			var targetsDir = Path.Combine(directory, "targets");
+			Directory.CreateDirectory(targetsDir);
+			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.GlobalTargetCss);
+			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.DefaultTarget);
+			File.WriteAllText(Path.Combine(targetsDir, "tts.html"), Presets.TtsTarget);
 
 			var cardsDir = Path.Combine(directory, "cards");
 			Directory.CreateDirectory(cardsDir);
@@ -39,7 +71,7 @@ public static class Creator {
 			Directory.CreateDirectory(scriptsDir);
 			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.FitTextScript);
 
-			Log.Success("Project created. Run 'tuffCards convert' to see an output.");
+			Log.Success("Example project created. Run 'tuffCards convert' to see an output.");
 		}
 		catch (Exception ex) {
 			Log.Error($"While creating: {ex.Message}");

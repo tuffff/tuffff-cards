@@ -1,7 +1,7 @@
 namespace TuffCards;
 
 public static class Presets {
-	public const string GlobalWrapperCss = """
+	public const string GlobalTargetCss = """
 .wrapper {
 	display: flex;
 	flex-wrap: wrap;
@@ -9,7 +9,87 @@ public static class Presets {
 	font-family: sans-serif;
 }
 
-.wrapper > div {
+.icon {
+	height: 12px;
+}
+
+.image {
+	object-fit: contain;
+	max-width: 100%;
+	max-height: 100%;
+}
+""";
+
+	public const string DefaultTarget = """
+<div class="wrapper default {{ name }}">{{ for card in cards }}
+	{{ card }}{{ end }}
+</div>
+
+<script>{{ for script in scripts }}
+	{{ script }}{{ end }}
+</script>
+
+<style>
+	.default {
+		margin: 8px;
+		gap: 8px;
+		> div {
+			border-radius: 8px;
+			border: solid thin black;
+		}
+	}
+	{{ globaltargetcss }}
+	{{ cardtypecss }}
+</style>
+""";
+
+	public const string TtsTarget = """
+<!-- image-size-actions:8000x8400 -->
+<!-- image-size-buildings:8000x8400 -->
+
+<div class="wrapper tts {{ name }}">{{ for card in cards }}
+	{{ card }}{{ end }}
+</div>
+
+<script>{{ for script in scripts }}
+	{{ script }}{{ end }}
+</script>
+
+<style>
+	html, body {
+		margin: 0;
+	}
+	.tts {
+		width: 2000px;
+		transform: scale(400%);
+		transform-origin: top left;
+	}
+	{{ globaltargetcss }}
+	{{ cardtypecss }}
+</style>
+""";
+
+	public const string DefaultActions = """
+<div>
+	<div class="name">{{ Name }}</div>
+	<div class="cost">{{ Cost }}</div>
+	<div class="title-image">{{ Image }}</div>
+	<div class="effect">
+		<div>{{ Effect }}</div>
+	</div>
+</div>
+""";
+
+	public const string DefaultActionsData = """
+Name;Cost;Effect;Image
+Do it;1;Do something;
+Do it hard;2;'tap: Do something *really* **strong**;"strong
+Don’t do it;0;Do nothing;"missing
+""";
+
+	public const string DefaultActionsCss = """
+.actions > div {
+	background: linear-gradient(to bottom right, #220088, #880022);
 	height: 300px;
 	width: 200px;
 	display: flex;
@@ -17,7 +97,6 @@ public static class Presets {
 	align-items: stretch;
 	color: white;
 	position: relative;
-
 	> .cost {
 		position: absolute;
 		top: 0;
@@ -26,17 +105,16 @@ public static class Presets {
 		width: 30px;
 		text-align: center;
 		border-bottom-right-radius: 12px;
-		border-top-left-radius: 7px;
 		font-weight: bold;
 		font-size: x-large;
 		color: black;
 		background: white;
 	}
 	> .name {
+		margin-left: 30px;
 		padding: 2px 6px;
 		flex: 0 0 auto;
 		align-self: stretch;
-		border-top-right-radius: 7px;
 		background: rgba(0, 0, 0, 0.3);
 		font-weight: bold;
 		font-size: large;
@@ -65,90 +143,12 @@ public static class Presets {
 		position: relative;
 	}
 }
-
-.icon {
-	height: 12px;
-}
-
-.image {
-	object-fit: contain;
-	max-width: 100%;
-	max-height: 100%;
-}
-""";
-
-	public const string DefaultWrapper = """
-<div class="wrapper {{ name }}">{{ for card in cards }}
-	{{ card }}{{ end }}
-</div>
-
-<script>{{ for script in scripts }}
-	{{ script }}{{ end }}
-</script>
-
-<style>
-	.wrapper {
-		margin: 8px;
-		gap: 8px;
-		> div {
-			border-radius: 8px;
-			border: solid thin black;
-		}
+.actions.default > div {
+	> .cost {
+		border-top-left-radius: 7px;
 	}
-	{{ globalwrappercss }}
-	{{ cardtypecss }}
-</style>
-""";
-
-	public const string TtsWrapper = """
-<!-- screenshot-size-actions:8000x8400 -->
-<!-- screenshot-size-buildings:8000x8400 -->
-
-<div class="wrapper {{ name }}">{{ for card in cards }}
-	{{ card }}{{ end }}
-</div>
-
-<script>{{ for script in scripts }}
-	{{ script }}{{ end }}
-</script>
-
-<style>
-	html, body {
-		margin: 0;
-	}
-	.wrapper {
-		width: 2000px;
-		transform: scale(400%);
-		transform-origin: top left;
-	}
-	{{ globalwrappercss }}
-	{{ cardtypecss }}
-</style>
-""";
-
-	public const string DefaultActions = """
-<div>
-	<div class="name">{{ Name }}</div>
-	<div class="cost">{{ Cost }}</div>
-	<div class="title-image">{{ Image }}</div>
-	<div class="effect">
-		<div>{{ Effect }}</div>
-	</div>
-</div>
-""";
-
-	public const string DefaultActionsData = """
-Name;Cost;Effect;Image
-Do it;1;Do something;
-Do it hard;2;'tap: Do something *really* **strong**;"strong
-Don’t do it;0;Do nothing;"missing
-""";
-
-	public const string DefaultActionsCss = """
-.actions > div {
-	background: linear-gradient(to bottom right, #220088, #880022);
 	> .name {
-		margin-left: 30px;
+		border-top-right-radius: 7px;
 	}
 }
 """;
@@ -173,12 +173,26 @@ The great, awesome Castle of TuffVille;;
 
 	public const string DefaultBuildingsCss = """
 .buildings > div {
+	height: 300px;
+	width: 200px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	color: white;
+	position: relative;
 	background: linear-gradient(45deg, #dca 12%, transparent 0, transparent 88%, #dca 0),
 	linear-gradient(135deg, transparent 37%, #a85 0, #a85 63%, transparent 0),
 	linear-gradient(45deg, transparent 37%, #dca 0, #dca 63%, transparent 0) #753;
 	background-size: 12px 12px;
 	justify-content: stretch;
 	> .name {
+		padding: 2px 6px;
+		flex: 0 0 auto;
+		align-self: stretch;
+		background: rgba(0, 0, 0, 0.3);
+		font-weight: bold;
+		font-size: large;
+		backdrop-filter: blur(3px);
 		text-align: center;
 		height: 25px;
 		display: flex;
@@ -189,20 +203,38 @@ The great, awesome Castle of TuffVille;;
 		}
 	}
 	> .effect {
+		display: flex;
 		flex: 1 1 0;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		margin: 8px;
 		> div {
 			height: 100%;
+			width: 90%;
+			padding: 4px;
 			background: #edb;
 			border: 3px solid #974;
 			border-radius: 0;
 			color: black;
 		}
 	}
-
 	.title-image {
+		display: inline-block;
+		width: 184px;
+		margin: 8px;
 		flex: 1 1 0;
 		min-height: 0;
+		text-align: center;
+		position: relative;
 	}
+}
+
+.buildings.default > div {
+	> .name {
+		border-radius: 7px 7px 0 0;
+	}
+
 }
 """;
 

@@ -75,6 +75,7 @@
         <Reference Include="System.Xml"/>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="CardTypeAdder.cs" />
         <Compile Include="Converter.cs"/>
         <Compile Include="Creator.cs"/>
         <Compile Include="Log.cs" />
