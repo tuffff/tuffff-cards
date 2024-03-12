@@ -1,89 +1,128 @@
 namespace TuffCards;
 
 public static class Presets {
+	public const string GlobalWrapperCss = """
+.wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	font-size: medium;
+	font-family: sans-serif;
+}
+
+.wrapper > div {
+	height: 300px;
+	width: 200px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	color: white;
+	position: relative;
+
+	> .cost {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 30px;
+		width: 30px;
+		text-align: center;
+		border-bottom-right-radius: 12px;
+		border-top-left-radius: 7px;
+		font-weight: bold;
+		font-size: x-large;
+		color: black;
+		background: white;
+	}
+	> .name {
+		padding: 2px 6px;
+		flex: 0 0 auto;
+		align-self: stretch;
+		border-top-right-radius: 7px;
+		background: rgba(0, 0, 0, 0.3);
+		font-weight: bold;
+		font-size: large;
+		backdrop-filter: blur(3px);
+	}
+	> .effect {
+		flex: 1 0 auto;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		margin: 8px;
+		> div {
+			width: 90%;
+			padding: 4px;
+			border-radius: 4px;
+			background: rgba(0, 0, 0, 0.3);
+		}
+	}
+	.title-image {
+		display: inline-block;
+		width: 184px;
+		margin: 8px;
+		flex: 1 0 auto;
+		text-align: center;
+		position: relative;
+	}
+}
+
+.icon {
+	height: 12px;
+}
+
+.image {
+	object-fit: contain;
+	max-width: 100%;
+	max-height: 100%;
+}
+""";
+
 	public const string DefaultWrapper = """
 <div class="wrapper {{ name }}">{{ for card in cards }}
 	{{ card }}{{ end }}
 </div>
 
+<script>{{ for script in scripts }}
+	{{ script }}{{ end }}
+</script>
+
 <style>
 	.wrapper {
-		display: flex;
-		flex-wrap: wrap;
+		margin: 8px;
 		gap: 8px;
-		font-size: medium;
-		font-family: sans-serif;
-	}
-
-	.wrapper > div {
-		height: 300px;
-		width: 200px;
-		display: flex;
-		flex-direction: column;
-		align-items: stretch;
-		border-radius: 8px;
-		border: solid thin black;
-		color: white;
-		position: relative;
-
-		> .cost {
-			position: absolute;
-			top: 0;
-			left: 0;
-			height: 30px;
-			width: 30px;
-			text-align: center;
-			border-bottom-right-radius: 12px;
-			border-top-left-radius: 7px;
-			font-weight: bold;
-			font-size: x-large;
-			color: black;
-			background: white;
-		}
-		> .name {
-			padding: 2px 6px;
-			flex: 0 0 auto;
-			align-self: stretch;
-			border-top-right-radius: 7px;
-			background: rgba(0, 0, 0, 0.3);
-			font-weight: bold;
-			font-size: large;
-			backdrop-filter: blur(3px);
-		}
-		> .effect {
-			flex: 1 0 auto;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			margin: 8px;
-			> div {
-				width: 90%;
-				padding: 4px;
-				border-radius: 4px;
-				background: rgba(0, 0, 0, 0.3);
-			}
-		}
-		.title-image {
-			display: inline-block;
-			width: 184px;
-			margin: 8px;
-			flex: 1 0 auto;
-			text-align: center;
-			position: relative;
+		> div {
+			border-radius: 8px;
+			border: solid thin black;
 		}
 	}
+	{{ globalwrappercss }}
+	{{ cardtypecss }}
+</style>
+""";
 
-	.icon {
-		height: 12px;
+	public const string TtsWrapper = """
+<!-- screenshot-size-actions:8000x8400 -->
+<!-- screenshot-size-buildings:8000x8400 -->
+
+<div class="wrapper {{ name }}">{{ for card in cards }}
+	{{ card }}{{ end }}
+</div>
+
+<script>{{ for script in scripts }}
+	{{ script }}{{ end }}
+</script>
+
+<style>
+	html, body {
+		margin: 0;
 	}
-
-	.image {
-		max-width: 100%;
-		max-height: 100%;
+	.wrapper {
+		width: 2000px;
+		transform: scale(400%);
+		transform-origin: top left;
 	}
-
-	{{ css }}
+	{{ globalwrappercss }}
+	{{ cardtypecss }}
 </style>
 """;
 
@@ -116,7 +155,7 @@ Don’t do it;0;Do nothing;"missing
 
 	public const string DefaultBuildings = """
 <div>
-	<div class="name">{{ Name }}</div>
+	<div class="name"><span class="fit">{{ Name }}</span></div>
 	<div class="title-image">{{ Image }}</div>
 	<div class="effect">
 		<div>{{ Effect }}</div>
@@ -129,7 +168,7 @@ Name;Effect;Image
 House;There it is.;
 Big House;It is really big!;"strong
 Villa;;
-Castle;;
+The great, awesome Castle of TuffVille;;
 """;
 
 	public const string DefaultBuildingsCss = """
@@ -141,6 +180,13 @@ Castle;;
 	justify-content: stretch;
 	> .name {
 		text-align: center;
+		height: 25px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		> span {
+			white-space: nowrap;
+		}
 	}
 	> .effect {
 		flex: 1 1 0;
@@ -156,6 +202,30 @@ Castle;;
 	.title-image {
 		flex: 1 1 0;
 		min-height: 0;
+	}
+}
+""";
+
+	public const string FitTextScript = """
+window.addEventListener('load', () => resizeAll())
+
+function resizeAll() {
+	const fitList = document.getElementsByClassName("fit");
+	for (fit of fitList) {
+		resize(fit);
+	}
+}
+
+function resize(fit) {
+    const parentStyle = window.getComputedStyle(fit.parentNode);
+	const parentWidth = fit.parentNode.clientWidth - parseInt(parentStyle.paddingLeft) - parseInt(parentStyle.paddingRight);
+	const parentHeight = fit.parentNode.clientHeight - parseInt(parentStyle.paddingTop) - parseInt(parentStyle.paddingBottom);
+	const initialSize = window.getComputedStyle(fit).fontSize;
+	var size = parseInt(initialSize);
+	while (fit.scrollWidth > parentWidth || fit.scrollHeight > parentHeight) {
+		size--;
+		console.log(size);
+		fit.style.setProperty('font-size', size + 'px');
 	}
 }
 """;

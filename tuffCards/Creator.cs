@@ -6,54 +6,44 @@ using System.Threading.Tasks;
 namespace TuffCards;
 
 public static class Creator {
-	public static async Task Create(bool force) {
+	public static Task Create(bool force) {
 		try {
 			var directory = new DirectoryInfo(Environment.CurrentDirectory).FullName;
 			if (!force && Directory.EnumerateFileSystemEntries(directory).Any())
 				throw new Exception("Current folder is not empty. Use --force to create anyway.");
 
 			var wrappersDir = Path.Combine(directory, "wrappers");
-			var defaultWrapper = Path.Combine(wrappersDir, "default.html");
-			var cardsDir = Path.Combine(directory, "cards");
-			var actionsCard = Path.Combine(cardsDir, "actions.html");
-			var actionsCardData = Path.Combine(cardsDir, "actions.csv");
-			var actionsCardCss = Path.Combine(cardsDir, "actions.css");
-			var buildingsCard = Path.Combine(cardsDir, "buildings.html");
-			var buildingsCardData = Path.Combine(cardsDir, "buildings.csv");
-			var buildingsCardCss = Path.Combine(cardsDir, "buildings.css");
-			var imagesDir = Path.Combine(directory, "images");
-			var strongImage = Path.Combine(imagesDir, "strong.svg");
-			var iconsDir = Path.Combine(directory, "icons");
-			var tapIcon = Path.Combine(iconsDir, "tap.svg");
-
 			Directory.CreateDirectory(wrappersDir);
-			Directory.CreateDirectory(cardsDir);
-			Directory.CreateDirectory(imagesDir);
-			Directory.CreateDirectory(iconsDir);
+			File.WriteAllText(Path.Combine(wrappersDir, "global.css"), Presets.GlobalWrapperCss);
+			File.WriteAllText(Path.Combine(wrappersDir, "default.html"), Presets.DefaultWrapper);
+			File.WriteAllText(Path.Combine(wrappersDir, "tts.html"), Presets.TtsWrapper);
 
-			using (var writer = new StreamWriter(defaultWrapper))
-				await writer.WriteLineAsync(Presets.DefaultWrapper);
-			using (var writer = new StreamWriter(actionsCard))
-				await writer.WriteLineAsync(Presets.DefaultActions);
-			using (var writer = new StreamWriter(actionsCardData))
-				await writer.WriteLineAsync(Presets.DefaultActionsData);
-			using (var writer = new StreamWriter(actionsCardCss))
-				await writer.WriteLineAsync(Presets.DefaultActionsCss);
-			using (var writer = new StreamWriter(buildingsCard))
-				await writer.WriteLineAsync(Presets.DefaultBuildings);
-			using (var writer = new StreamWriter(buildingsCardData))
-				await writer.WriteLineAsync(Presets.DefaultBuildingsData);
-			using (var writer = new StreamWriter(buildingsCardCss))
-				await writer.WriteLineAsync(Presets.DefaultBuildingsCss);
-			using (var writer = new StreamWriter(strongImage))
-				await writer.WriteLineAsync(Presets.StrongImage);
-			using (var writer = new StreamWriter(tapIcon))
-				await writer.WriteLineAsync(Presets.TapImage);
+			var cardsDir = Path.Combine(directory, "cards");
+			Directory.CreateDirectory(cardsDir);
+			File.WriteAllText(Path.Combine(cardsDir, "actions.html"), Presets.DefaultActions);
+			File.WriteAllText(Path.Combine(cardsDir, "actions.csv"), Presets.DefaultActionsData);
+			File.WriteAllText(Path.Combine(cardsDir, "actions.css"), Presets.DefaultActionsCss);
+			File.WriteAllText(Path.Combine(cardsDir, "buildings.html"), Presets.DefaultBuildings);
+			File.WriteAllText(Path.Combine(cardsDir, "buildings.csv"), Presets.DefaultBuildingsData);
+			File.WriteAllText(Path.Combine(cardsDir, "buildings.css"), Presets.DefaultBuildingsCss);
+
+			var imagesDir = Path.Combine(directory, "images");
+			Directory.CreateDirectory(imagesDir);
+			File.WriteAllText(Path.Combine(imagesDir, "strong.svg"), Presets.StrongImage);
+
+			var iconsDir = Path.Combine(directory, "icons");
+			Directory.CreateDirectory(iconsDir);
+			File.WriteAllText(Path.Combine(iconsDir, "tap.svg"), Presets.TapImage);
+
+			var scriptsDir = Path.Combine(directory, "scripts");
+			Directory.CreateDirectory(scriptsDir);
+			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.FitTextScript);
 
 			Log.Success("Project created. Run 'tuffCards convert' to see an output.");
 		}
 		catch (Exception ex) {
 			Log.Error($"While creating: {ex.Message}");
 		}
+		return Task.CompletedTask;
 	}
 }
