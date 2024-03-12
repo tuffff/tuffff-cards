@@ -77,6 +77,7 @@
     <ItemGroup>
         <Compile Include="Converter.cs"/>
         <Compile Include="Creator.cs"/>
+        <Compile Include="Log.cs" />
         <Compile Include="MarkdownParser.cs"/>
         <Compile Include="Presets.cs"/>
         <Compile Include="Program.cs"/>

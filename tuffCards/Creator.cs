@@ -17,6 +17,10 @@ public static class Creator {
 			var cardsDir = Path.Combine(directory, "cards");
 			var actionsCard = Path.Combine(cardsDir, "actions.html");
 			var actionsCardData = Path.Combine(cardsDir, "actions.csv");
+			var actionsCardCss = Path.Combine(cardsDir, "actions.css");
+			var buildingsCard = Path.Combine(cardsDir, "buildings.html");
+			var buildingsCardData = Path.Combine(cardsDir, "buildings.csv");
+			var buildingsCardCss = Path.Combine(cardsDir, "buildings.css");
 			var imagesDir = Path.Combine(directory, "images");
 			var strongImage = Path.Combine(imagesDir, "strong.svg");
 			var iconsDir = Path.Combine(directory, "icons");
@@ -33,15 +37,23 @@ public static class Creator {
 				await writer.WriteLineAsync(Presets.DefaultActions);
 			using (var writer = new StreamWriter(actionsCardData))
 				await writer.WriteLineAsync(Presets.DefaultActionsData);
+			using (var writer = new StreamWriter(actionsCardCss))
+				await writer.WriteLineAsync(Presets.DefaultActionsCss);
+			using (var writer = new StreamWriter(buildingsCard))
+				await writer.WriteLineAsync(Presets.DefaultBuildings);
+			using (var writer = new StreamWriter(buildingsCardData))
+				await writer.WriteLineAsync(Presets.DefaultBuildingsData);
+			using (var writer = new StreamWriter(buildingsCardCss))
+				await writer.WriteLineAsync(Presets.DefaultBuildingsCss);
 			using (var writer = new StreamWriter(strongImage))
 				await writer.WriteLineAsync(Presets.StrongImage);
 			using (var writer = new StreamWriter(tapIcon))
 				await writer.WriteLineAsync(Presets.TapImage);
 
-			Console.WriteLine("Project created. Run 'tuffCards convert' to see an output.");
+			Log.Success("Project created. Run 'tuffCards convert' to see an output.");
 		}
 		catch (Exception ex) {
-			Console.Error.WriteLine($"Error converting: {ex.Message}");
+			Log.Error($"While creating: {ex.Message}");
 		}
 	}
 }

@@ -17,7 +17,7 @@ public static class Converter {
 			var iconDirectory = Path.Combine(directory, "icons");
 			var imageDirectory = Path.Combine(directory, "images");
 
-			Console.WriteLine($"Project directory: {directory}");
+			Log.Info($"Project directory: {directory}");
 
 			if (!Directory.Exists(wrapperDirectory)) throw new Exception("Directory '/wrappers' not found. Did you create a new project with 'tuffCards create'?");
 			if (!Directory.Exists(cardsDirectory)) throw new Exception("Directory '/cards' not found. Did you create a new project with 'tuffCards create'?");
@@ -26,7 +26,7 @@ public static class Converter {
 			var wrapperPath = Path.Combine(wrapperDirectory, wrapper);
 			if (!File.Exists(wrapperPath)) throw new Exception($"Wrapper file '{wrapper}' not found. (full path: {wrapperPath})");
 
-			Console.WriteLine($"Using wrapper template: {wrapperPath}");
+			Log.Info($"Using wrapper template: {wrapperPath}");
 			Template wrapperTemplate;
 			try {
 				wrapperTemplate = Template.Parse(File.ReadAllText(wrapperPath));
@@ -39,11 +39,11 @@ public static class Converter {
 			var parser = new MarkdownParser(iconDirectory, imageDirectory, outputDirectory);
 			foreach (var cardType in new DirectoryInfo(cardsDirectory).EnumerateFiles("*.html", SearchOption.AllDirectories)) {
 				var name = Path.GetFileNameWithoutExtension(cardType.Name);
-				Console.WriteLine($"Card type: {name} ...");
+				Log.Info($"Card type: {name} ...");
 				var dataName = $"{name}.csv";
-				var cardData = Path.Combine(cardType.Directory.FullName, dataName);
+				var cardData = Path.Combine(cardType.Directory!.FullName, dataName);
 				if (!File.Exists(cardData)) {
-					Console.WriteLine($"Warning: card data file {dataName} missing, skipping.");
+					Log.Warning($"Card data file {dataName} missing, skipping.");
 					continue;
 				}
 
@@ -53,7 +53,7 @@ public static class Converter {
 					if (wrapperTemplate.HasErrors) throw new InvalidOperationException(wrapperTemplate.Messages.ToString());
 				}
 				catch (Exception ex) {
-					Console.WriteLine($"Warning: Error parsing card type template. Skipping. Message: {ex.Message}");
+					Log.Warning($"Error parsing card type template. Skipping. Message: {ex.Message}");
 					continue;
 				}
 				var cards = new List<string>();
@@ -67,21 +67,39 @@ public static class Converter {
 							var result = await template.RenderAsync(data);
 							cards.Add(result);
 						}
-						var outputPath = Path.Combine(outputDirectory, $"{name}.html");
-						using var output = new StreamWriter(outputPath, false);
-						var outputResult = await wrapperTemplate.RenderAsync(new { name, cards });
-						Console.WriteLine($"... created {cards.Count} cards.");
-						await output.WriteLineAsync(outputResult);
 					}
 					catch (Exception ex) {
-						Console.WriteLine($"Error parsing card data: {ex.Message}. Skipping.");
+						Log.Error($"Parsing card data: {ex.Message}. Skipping.");
 					}
 				}
+
+				var css = string.Empty;
+				var cssPath = Path.Combine(cardType.Directory.FullName, $"{name}.css");
+				if (File.Exists(cssPath)) {
+					try {
+						css = File.ReadAllText(cssPath);
+						Log.Info($"... Also added css for {name} ...");
+					}
+					catch (Exception ex) {
+						Log.Error($"Adding css: {ex.Message}. Skipping.");
+					}
+				}
+
+				try {
+					var outputPath = Path.Combine(outputDirectory, $"{name}.html");
+					using var output = new StreamWriter(outputPath, false);
+					var outputResult = await wrapperTemplate.RenderAsync(new { name, cards, css });
+					Log.Info($"... created {cards.Count} cards: {outputPath}");
+					await output.WriteLineAsync(outputResult);
+				}
+				catch (Exception ex) {
+					Log.Error($"Wring output: {ex.Message}. Skipping.");
+				}
 			}
-			Console.WriteLine("Finished.");
+			Log.Success("Finished.");
 		}
 		catch (Exception ex) {
-			Console.Error.WriteLine($"Error converting: {ex.Message}");
+			Log.Error($"While converting: {ex.Message}");
 		}
 	}
 }

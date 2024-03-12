@@ -11,24 +11,44 @@ public static class Presets {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
+		font-size: medium;
+		font-family: sans-serif;
 	}
 
-	.actions > div {
-		height: 500px;
+	.wrapper > div {
+		height: 300px;
 		width: 200px;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
 		border-radius: 8px;
 		border: solid thin black;
-		background: linear-gradient(to bottom right, #220088, #880022);
 		color: white;
 		position: relative;
 
 		> .cost {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 30px;
+			width: 30px;
+			text-align: center;
+			border-bottom-right-radius: 12px;
+			border-top-left-radius: 7px;
+			font-weight: bold;
+			font-size: x-large;
+			color: black;
+			background: white;
+		}
+		> .name {
+			padding: 2px 6px;
 			flex: 0 0 auto;
 			align-self: stretch;
-			background: rgba(0, 0, 0, 0.5);
+			border-top-right-radius: 7px;
+			background: rgba(0, 0, 0, 0.3);
+			font-weight: bold;
+			font-size: large;
+			backdrop-filter: blur(3px);
 		}
 		> .effect {
 			flex: 1 0 auto;
@@ -37,28 +57,41 @@ public static class Presets {
 			justify-content: center;
 			align-items: center;
 			margin: 8px;
+			> div {
+				width: 90%;
+				padding: 4px;
+				border-radius: 4px;
+				background: rgba(0, 0, 0, 0.3);
+			}
 		}
-		.image {
+		.title-image {
+			display: inline-block;
 			width: 184px;
 			margin: 8px;
 			flex: 1 0 auto;
+			text-align: center;
+			position: relative;
 		}
 	}
 
 	.icon {
-		height: 16px;
+		height: 12px;
 	}
 
-	p {
-		margin: 0;
+	.image {
+		max-width: 100%;
+		max-height: 100%;
 	}
+
+	{{ css }}
 </style>
 """;
 
 	public const string DefaultActions = """
 <div>
+	<div class="name">{{ Name }}</div>
 	<div class="cost">{{ Cost }}</div>
-	{{ Image }}
+	<div class="title-image">{{ Image }}</div>
 	<div class="effect">
 		<div>{{ Effect }}</div>
 	</div>
@@ -66,9 +99,65 @@ public static class Presets {
 """;
 
 	public const string DefaultActionsData = """
-Cost;Effect;Image
-1;Do something;
-2;'tap: Do something *really* **strong**;"strong
+Name;Cost;Effect;Image
+Do it;1;Do something;
+Do it hard;2;'tap: Do something *really* **strong**;"strong
+Don’t do it;0;Do nothing;"missing
+""";
+
+	public const string DefaultActionsCss = """
+.actions > div {
+	background: linear-gradient(to bottom right, #220088, #880022);
+	> .name {
+		margin-left: 30px;
+	}
+}
+""";
+
+	public const string DefaultBuildings = """
+<div>
+	<div class="name">{{ Name }}</div>
+	<div class="title-image">{{ Image }}</div>
+	<div class="effect">
+		<div>{{ Effect }}</div>
+	</div>
+</div>
+""";
+
+	public const string DefaultBuildingsData = """
+Name;Effect;Image
+House;There it is.;
+Big House;It is really big!;"strong
+Villa;;
+Castle;;
+""";
+
+	public const string DefaultBuildingsCss = """
+.buildings > div {
+	background: linear-gradient(45deg, #dca 12%, transparent 0, transparent 88%, #dca 0),
+	linear-gradient(135deg, transparent 37%, #a85 0, #a85 63%, transparent 0),
+	linear-gradient(45deg, transparent 37%, #dca 0, #dca 63%, transparent 0) #753;
+	background-size: 12px 12px;
+	justify-content: stretch;
+	> .name {
+		text-align: center;
+	}
+	> .effect {
+		flex: 1 1 0;
+		> div {
+			height: 100%;
+			background: #edb;
+			border: 3px solid #974;
+			border-radius: 0;
+			color: black;
+		}
+	}
+
+	.title-image {
+		flex: 1 1 0;
+		min-height: 0;
+	}
+}
 """;
 
 	public const string TapImage = """<svg style="height: 512px; width: 512px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g class="" style="" transform="translate(0,0)"><path d="M263.09 50c-11.882-.007-23.875 1.018-35.857 3.13C142.026 68.156 75.156 135.026 60.13 220.233 45.108 305.44 85.075 391.15 160.005 434.41c32.782 18.927 69.254 27.996 105.463 27.553 46.555-.57 92.675-16.865 129.957-48.15l-30.855-36.768c-50.95 42.75-122.968 49.05-180.566 15.797-57.597-33.254-88.152-98.777-76.603-164.274 11.55-65.497 62.672-116.62 128.17-128.168 51.656-9.108 103.323 7.98 139.17 43.862L327 192h128V64l-46.34 46.342C370.242 71.962 317.83 50.03 263.09 50z" fill="#fff" fill-opacity="1"></path></g></svg>""";

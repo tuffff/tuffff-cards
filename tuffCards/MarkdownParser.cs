@@ -24,7 +24,11 @@ public class MarkdownParser {
 	}
 
 	public string Parse(string md) {
-		return Markdown.ToHtml(md, Pipeline);
+		var result = Markdown.ToHtml(md, Pipeline);
+		if (result.LastIndexOf("<p>", StringComparison.InvariantCultureIgnoreCase) == 0 && result.IndexOf("</p>", StringComparison.InvariantCultureIgnoreCase) == result.Length - 5) {
+			result = result.Substring(3, result.Length - 8);
+		}
+		return result;
 	}
 
 }
@@ -116,12 +120,12 @@ public class ImageRenderer : HtmlObjectRenderer<Image> {
 		if (dir.Exists) {
 			file = dir.EnumerateFiles($"{obj.Name}.*", SearchOption.AllDirectories).FirstOrDefault();
 		}
+		var cssClass = obj.IsIcon ? "icon" : "image";
 		if (file == null) {
-			Console.WriteLine($"Warning: Image '{obj.Name}' not found");
-			renderer.Write($"<em>{obj.Name}</em>");
+			Log.Warning($"{cssClass} '{obj.Name}' not found");
+			renderer.Write($"<em class=\"{cssClass}\">{obj.Name}</em>");
 		}
 		else {
-			var cssClass = obj.IsIcon ? "icon" : "image";
 			var fileName = $"{cssClass}-{file.Name}";
 			var outputPath = Path.Combine(Options.OutputPath, fileName);
 			if (!File.Exists(outputPath)) File.Copy(file.FullName, outputPath);
