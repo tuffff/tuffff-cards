@@ -2,8 +2,8 @@
 tuffCards is a small tool to convert html/css/csv templates to cards.
 
 # Quick Start
-Installation: `choco install tuff-cards --version 0.1` (it's still in review)
-Command overview: `tuffCards --help`
+Installation: `choco install tuff-cards --version 0.1` (it's still in review)\
+Command overview: `tuffCards --help`\
 See example output:
 ```
 md example-project | cd
