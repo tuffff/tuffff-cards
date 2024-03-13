@@ -48,12 +48,9 @@ public class ImageParser : InlineParser {
 	}
 
 	public override bool Match(InlineProcessor processor, ref StringSlice slice) {
-		Console.Write("found smth");
 		var isImage = false;
 
-		var opening = slice.CurrentChar;
 		slice.NextChar();
-
 		if (slice.CurrentChar == '{') {
 			isImage = true;
 			slice.NextChar();
@@ -68,16 +65,15 @@ public class ImageParser : InlineParser {
 			end = slice.Start;
 			current = slice.NextChar();
 		}
-		Console.Write($"{start}-{end}");
-
 		if (slice.CurrentChar != '}') {
-			Console.Write("out at first");
 			return false;
 		}
 		slice.NextChar();
-		if (isImage && slice.CurrentChar != '}') {
-			Console.Write("out at second");
-			return false;
+		if (isImage) {
+			if (slice.CurrentChar != '}') {
+				return false;
+			}
+			slice.NextChar();
 		}
 
 		var inlineStart = processor.GetSourcePosition
@@ -95,7 +91,6 @@ public class ImageParser : InlineParser {
 			Name = result,
 			IsIcon = !isImage
 		};
-		Console.Write($"found: {result}");
 
 		return true;
 	}
