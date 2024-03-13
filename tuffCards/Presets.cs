@@ -83,7 +83,7 @@ public static class Presets {
 	public const string DefaultActionsData = """
 Name;Cost;Effect;Image
 Do it;1;Do something;
-Do it hard;2;'tap: Do something *really* **strong**;"strong
+Do it hard;2;{tap}: Do something *really* **strong**;{{strong}}
 Don’t do it;0;Do nothing;"missing
 """;
 
@@ -166,7 +166,7 @@ Don’t do it;0;Do nothing;"missing
 	public const string DefaultBuildingsData = """
 Name;Effect;Image
 House;There it is.;
-Big House;It is really big!;"strong
+Big House;It is really big!;{{strong}}
 Villa;;
 The great, awesome Castle of TuffVille;;
 """;
