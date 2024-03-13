@@ -16,6 +16,7 @@
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
+        <ApplicationIcon>..\res\icon.ico</ApplicationIcon>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -187,7 +188,7 @@
     <Import Project="..\packages\Scriban.5.9.1\build\Scriban.targets" Condition="Exists('..\packages\Scriban.5.9.1\build\Scriban.targets')"/>
     <Import Project="..\packages\Fody.6.5.5\build\Fody.targets" Condition="Exists('..\packages\Fody.6.5.5\build\Fody.targets')" />
     <Import Project="..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets')" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
     </Target>
