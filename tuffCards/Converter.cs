@@ -1,7 +1,9 @@
 using Scriban;
+using Scriban.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -75,7 +77,10 @@ public static class Converter {
 							var data = headers
 								.Zip(line.Split(';'), (header, row) => new { header, row })
 								.ToDictionary(x => x.header, x => parser.Parse(x.row));
-							var result = await template.RenderAsync(data);
+							var scriptObject = new ScriptObject();
+							scriptObject.Import(data);
+							scriptObject.Import("md", new Func<string, string>(s => parser.Parse(s)));
+							var result = await template.RenderAsync(scriptObject);
 							cards.Add(result);
 						}
 					}
@@ -122,7 +127,17 @@ public static class Converter {
 				var outputPath = Path.Combine(outputDirectory, $"{name}.html");
 				try {
 					using var output = new StreamWriter(outputPath, false);
-					var outputResult = await targetTemplate.RenderAsync(new { name, cards, cardtypecss = cardTypeCss, globaltargetcss = globalTargetCss, scripts });
+					var model = new WrapperModel(parser) {
+						name = name,
+						cards = cards,
+						cardtypecss = cardTypeCss,
+						globaltargetcss = globalTargetCss,
+						scripts = scripts
+					};
+					var scriptObject = new ScriptObject();
+					scriptObject.Import(model);
+					scriptObject.Import("md", new Func<string, string>(s => parser.Parse(s)));
+					var outputResult = await targetTemplate.RenderAsync(scriptObject);
 					Log.Info($"... created {cards.Count} cards: {outputPath}");
 					await output.WriteLineAsync(outputResult);
 				}
@@ -173,6 +188,23 @@ public static class Converter {
 		}
 		catch (Exception ex) {
 			Log.Error($"While converting: {ex.Message}");
+		}
+	}
+
+	[SuppressMessage("ReSharper", "InconsistentNaming")]
+	[SuppressMessage("ReSharper", "IdentifierTypo")]
+	private class WrapperModel {
+		private readonly MarkdownParser Parser;
+		public WrapperModel(MarkdownParser parser) {
+			Parser = parser;
+		}
+		public string name { get; set; } = "";
+		public IList<string> cards { get; set; } = new List<string>();
+		public string cardtypecss { get; set; } = "";
+		public string globaltargetcss { get; set; } = "";
+		public IList<string> scripts { get; set; } = new List<string>();
+		public string md(string s) {
+			return Parser.Parse(s);
 		}
 	}
 }
