@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish tuffCards to folder" type="DotNetFolderPublish" factoryName="Publish to folder">
+    <riderPublish configuration="Release" delete_existing_files="true" platform="Any CPU" produce_single_file="true" runtime="win-x64" self_contained="true" target_folder="$PROJECT_DIR$/publish" target_framework="net8.0" trim_unused_assemblies="true" uuid_high="5942724239923433092" uuid_low="-4834069187792733365" />
+    <method v="2" />
+  </configuration>
+</component>
