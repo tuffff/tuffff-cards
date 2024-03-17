@@ -1,6 +1,6 @@
 bin/
 obj/
 /packages/
-/publish
+/publish/
 riderModule.iml
 /_ReSharper.Caches/

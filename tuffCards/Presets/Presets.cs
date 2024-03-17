@@ -30,8 +30,11 @@ public static class Presets {
 </script>
 
 <style>
+	body {
+		margin: 0;
+	}
 	.default {
-		margin: 8px;
+		padding: 8px;
 		gap: 8px;
 		> div {
 			border-radius: 8px;
@@ -44,9 +47,6 @@ public static class Presets {
 """;
 
 	public const string TtsTarget = """
-<!-- image-size-actions:8000x8400 -->
-<!-- image-size-buildings:8000x8400 -->
-
 <div class="wrapper tts {{ name }}">{{ for card in cards }}
 	{{ card }}{{ end }}
 </div>
@@ -59,10 +59,10 @@ public static class Presets {
 	html, body {
 		margin: 0;
 	}
-	.tts {
-		width: 2000px;
-		transform: scale(400%);
-		transform-origin: top left;
+	.wrapper.tts {
+		display: grid;
+		grid-template-columns: repeat(10, min-content);
+		grid-auto-flow: row;
 	}
 	{{ globaltargetcss }}
 	{{ cardtypecss }}
