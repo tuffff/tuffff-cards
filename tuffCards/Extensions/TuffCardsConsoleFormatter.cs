@@ -26,9 +26,9 @@ public class TuffCardsConsoleFormatter : ConsoleFormatter
 		var exception = logEntry.Exception;
 
 		textWriter.Write(logEntry.Category.AsSpan(logEntry.Category.LastIndexOf('.') + 1));
-		textWriter.Write(":");
+		WriteScopeInformation(textWriter, scopeProvider);
+		textWriter.Write(": ");
 
-		WriteScopeInformation(textWriter, scopeProvider, true);
 		WriteMessage(textWriter, message);
 		if (exception != null) {
 			WriteMessage(textWriter, exception.ToString());
@@ -37,9 +37,8 @@ public class TuffCardsConsoleFormatter : ConsoleFormatter
 		textWriter.Write(Environment.NewLine);
 	}
 
-	private static void WriteMessage(TextWriter textWriter, string message)
+	private void WriteMessage(TextWriter textWriter, string message)
 	{
-			textWriter.Write(' ');
 			var newMessage = message.Replace(Environment.NewLine, "\\ ");
 			textWriter.Write(newMessage);
 	}
@@ -58,27 +57,13 @@ public class TuffCardsConsoleFormatter : ConsoleFormatter
 		};
 	}
 
-	private void WriteScopeInformation(TextWriter textWriter, IExternalScopeProvider? scopeProvider, bool singleLine)
+	private static void WriteScopeInformation(TextWriter textWriter, IExternalScopeProvider? scopeProvider)
 	{
-			bool paddingNeeded = !singleLine;
-			scopeProvider?.ForEachScope((scope, state) =>
-			{
-				if (paddingNeeded)
-				{
-					paddingNeeded = false;
-					state.Write("=> ");
-				}
-				else
-				{
-					state.Write(" => ");
-				}
-				state.Write(scope);
-			}, textWriter);
-
-			if (!paddingNeeded && !singleLine)
-			{
-				textWriter.Write(Environment.NewLine);
-			}
+		scopeProvider?.ForEachScope((scope, state) =>
+		{
+			state.Write(" | ");
+			state.Write(scope);
+		}, textWriter);
 	}
 
 	private readonly struct ConsoleColors

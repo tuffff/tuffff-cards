@@ -1,4 +1,4 @@
-namespace TuffCards;
+namespace tuffCards.Repositories;
 
 public class FolderRepository {
 	private readonly string TargetDirectory;
@@ -34,7 +34,7 @@ public class FolderRepository {
 	}
 
 	private readonly string IconDirectory;
-	public string GetIconDirectory() {
+	public string GetIconsDirectory() {
 		Directory.CreateDirectory(IconDirectory);
 		return IconDirectory;
 	}

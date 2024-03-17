@@ -1,3 +1,5 @@
+using tuffCards.Repositories;
+
 namespace tuffCards.Commands;
 
 public class CardTypeAdder {
@@ -10,7 +12,7 @@ public class CardTypeAdder {
 	}
 
 	public Task Add(string name, bool force) {
-		var cardsDirectory = Path.Combine(".", "cards");
+		var cardsDirectory = FolderRepository.GetCardsDirectory();
 		var htmlPath = Path.Combine(cardsDirectory, $"{name}.html");
 		var csvPath = Path.Combine(cardsDirectory, $"{name}.csv");
 		var cssPath = Path.Combine(cardsDirectory, $"{name}.css");
@@ -40,7 +42,7 @@ public class CardTypeAdder {
 			                               left: 10px;
 			                           }
 			                           """);
-			Logger.LogSuccess($"Card type {name} added successfully.");
+			Logger.LogSuccess("Card type {name} added successfully.", name);
 		}
 		return Task.CompletedTask;
 	}

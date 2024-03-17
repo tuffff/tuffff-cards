@@ -1,3 +1,5 @@
+using tuffCards.Repositories;
+
 namespace tuffCards.Markdown;
 
 public class TuffCardsMarkdownParser {
@@ -9,7 +11,7 @@ public class TuffCardsMarkdownParser {
 		Pipeline = new MarkdownPipelineBuilder()
 			.UseImages(new ImageOptions {
 				ImagesPath = folderRepository.GetImageDirectory(),
-				IconsPath = folderRepository.GetIconDirectory(),
+				IconsPath = folderRepository.GetIconsDirectory(),
 				OutputPath = folderRepository.GetOutputDirectory(targetName)
 			}, logger)
 			.Build();
@@ -20,6 +22,7 @@ public class TuffCardsMarkdownParser {
 		if (result.LastIndexOf("<p>", StringComparison.InvariantCultureIgnoreCase) == 0 && result.IndexOf("</p>", StringComparison.InvariantCultureIgnoreCase) == result.Length - 5) {
 			result = result.Substring(3, result.Length - 8);
 		}
+		Logger.LogDebug("Converted {md} to {result}", md, result);
 		return result;
 	}
 
@@ -89,14 +92,14 @@ public class ImageParser : InlineParser {
 }
 
 public class Image : LeafInline {
-	public string Name { get; set; } = string.Empty;
-	public bool IsIcon { get; set; }
+	public string Name { get; init; } = string.Empty;
+	public bool IsIcon { get; init; }
 }
 
 public class ImageOptions {
-	public string ImagesPath { get; set; } = string.Empty;
-	public string OutputPath { get; set; } = string.Empty;
-	public string IconsPath { get; set; } = string.Empty;
+	public string ImagesPath { get; init; } = string.Empty;
+	public string OutputPath { get; init; } = string.Empty;
+	public string IconsPath { get; init; } = string.Empty;
 }
 
 public class ImageExtension : IMarkdownExtension {
@@ -133,7 +136,7 @@ public class ImageRenderer : HtmlObjectRenderer<Image> {
 		}
 		var cssClass = obj.IsIcon ? "icon" : "image";
 		if (file == null) {
-			Logger.LogWarning($"{cssClass} '{obj.Name}' not found");
+			Logger.LogWarning("{cssClass} '{objName}' not found", cssClass, obj.Name);
 			renderer.Write($"<em class=\"{cssClass}\">{obj.Name}</em>");
 		}
 		else {

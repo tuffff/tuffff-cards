@@ -1,4 +1,4 @@
-namespace TuffCards;
+namespace tuffCards.Presets;
 
 public static class Presets {
 	public const string GlobalTargetCss = """

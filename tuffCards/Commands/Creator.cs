@@ -1,3 +1,5 @@
+using tuffCards.Repositories;
+
 namespace tuffCards.Commands;
 
 public class Creator {
@@ -15,23 +17,16 @@ public class Creator {
 			if (!force && Directory.EnumerateFileSystemEntries(directory).Any())
 				throw new Exception("Current folder is not empty. Use --force to create anyway.");
 
-			var targetsDir = Path.Combine(directory, "targets");
-			Directory.CreateDirectory(targetsDir);
-			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.GlobalTargetCss);
-			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.DefaultTarget);
+			var targetsDir = FolderRepository.GetTargetDirectory();
+			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.Presets.GlobalTargetCss);
+			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.Presets.DefaultTarget);
 
-			var cardsDir = Path.Combine(directory, "cards");
-			Directory.CreateDirectory(cardsDir);
+			FolderRepository.GetCardsDirectory();
+			FolderRepository.GetImageDirectory();
+			FolderRepository.GetIconsDirectory();
 
-			var imagesDir = Path.Combine(directory, "images");
-			Directory.CreateDirectory(imagesDir);
-
-			var iconsDir = Path.Combine(directory, "icons");
-			Directory.CreateDirectory(iconsDir);
-
-			var scriptsDir = Path.Combine(directory, "scripts");
-			Directory.CreateDirectory(scriptsDir);
-			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.FitTextScript);
+			var scriptsDir = FolderRepository.GetScriptsDirectory();
+			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.Presets.FitTextScript);
 
 			Logger.LogSuccess("Project created. Run 'tuffCards add-type <name>' to add some cards.");
 		}
@@ -47,32 +42,27 @@ public class Creator {
 			if (!force && Directory.EnumerateFileSystemEntries(directory).Any())
 				throw new Exception("Current folder is not empty. Use --force to create anyway.");
 
-			var targetsDir = Path.Combine(directory, "targets");
-			Directory.CreateDirectory(targetsDir);
-			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.GlobalTargetCss);
-			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.DefaultTarget);
-			File.WriteAllText(Path.Combine(targetsDir, "tts.html"), Presets.TtsTarget);
+			var targetsDir = FolderRepository.GetTargetDirectory();
+			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.Presets.GlobalTargetCss);
+			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.Presets.DefaultTarget);
+			File.WriteAllText(Path.Combine(targetsDir, "tts.html"), Presets.Presets.TtsTarget);
 
-			var cardsDir = Path.Combine(directory, "cards");
-			Directory.CreateDirectory(cardsDir);
-			File.WriteAllText(Path.Combine(cardsDir, "actions.html"), Presets.DefaultActions);
-			File.WriteAllText(Path.Combine(cardsDir, "actions.csv"), Presets.DefaultActionsData);
-			File.WriteAllText(Path.Combine(cardsDir, "actions.css"), Presets.DefaultActionsCss);
-			File.WriteAllText(Path.Combine(cardsDir, "buildings.html"), Presets.DefaultBuildings);
-			File.WriteAllText(Path.Combine(cardsDir, "buildings.csv"), Presets.DefaultBuildingsData);
-			File.WriteAllText(Path.Combine(cardsDir, "buildings.css"), Presets.DefaultBuildingsCss);
+			var cardsDir = FolderRepository.GetCardsDirectory();
+			File.WriteAllText(Path.Combine(cardsDir, "actions.html"), Presets.Presets.DefaultActions);
+			File.WriteAllText(Path.Combine(cardsDir, "actions.csv"), Presets.Presets.DefaultActionsData);
+			File.WriteAllText(Path.Combine(cardsDir, "actions.css"), Presets.Presets.DefaultActionsCss);
+			File.WriteAllText(Path.Combine(cardsDir, "buildings.html"), Presets.Presets.DefaultBuildings);
+			File.WriteAllText(Path.Combine(cardsDir, "buildings.csv"), Presets.Presets.DefaultBuildingsData);
+			File.WriteAllText(Path.Combine(cardsDir, "buildings.css"), Presets.Presets.DefaultBuildingsCss);
 
-			var imagesDir = Path.Combine(directory, "images");
-			Directory.CreateDirectory(imagesDir);
-			File.WriteAllText(Path.Combine(imagesDir, "strong.svg"), Presets.StrongImage);
+			var imagesDir = FolderRepository.GetImageDirectory();
+			File.WriteAllText(Path.Combine(imagesDir, "strong.svg"), Presets.Presets.StrongImage);
 
-			var iconsDir = Path.Combine(directory, "icons");
-			Directory.CreateDirectory(iconsDir);
-			File.WriteAllText(Path.Combine(iconsDir, "tap.svg"), Presets.TapImage);
+			var iconsDir = FolderRepository.GetIconsDirectory();
+			File.WriteAllText(Path.Combine(iconsDir, "tap.svg"), Presets.Presets.TapImage);
 
-			var scriptsDir = Path.Combine(directory, "scripts");
-			Directory.CreateDirectory(scriptsDir);
-			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.FitTextScript);
+			var scriptsDir = FolderRepository.GetScriptsDirectory();
+			File.WriteAllText(Path.Combine(scriptsDir, "fit-text.js"), Presets.Presets.FitTextScript);
 
 			Logger.LogSuccess("Example project created. Run 'tuffCards convert' to see an output.");
 		}

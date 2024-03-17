@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.CommandLine;
 using tuffCards.Commands;
+using tuffCards.Repositories;
 
 namespace TuffCards;
 
