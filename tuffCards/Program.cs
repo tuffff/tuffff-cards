@@ -9,7 +9,7 @@ public class Program {
 	public static async Task Main(string[] args) {
 		var logLevelArg = new Option<LogLevel>("--log-level", () => LogLevel.Information, "Sets the log level.");
 		var targetArg = new Option<string>("--target", () => "default", "The name of the target file (in /targets).");
-		var cardTypeArg = new Option<string>("--type", () => string.Empty, "Only creates card types where the name contains this argument.");
+		var cardTypeArg = new Option<string?>("--type", () => null, "Only creates card types where the name contains this argument.");
 		var singleArg = new Option<bool>("--single", () => false, "Creates the images as single files instead. Uses first column for names. Excludes --target.");
 		var forceArg = new Option<bool>("--force", () => false, "Force the command, ignore warnings.");
 		var generateImageArg = new Option<bool>("--image", () => false, "Creates a png by taking a render after generating the html (with chrome expected at default path). You should specify the size in the target.");

@@ -15,7 +15,7 @@ public class Converter {
 		Logger = logger;
 	}
 
-	public async Task Convert(string target, string type, bool single, bool image) {
+	public async Task Convert(string target, string? type, bool single, bool image) {
 		try {
 			var targetTemplate = GetTargetTemplate(target);
 			var outputDirectory = FolderRepository.GetOutputDirectory(target);
@@ -28,7 +28,7 @@ public class Converter {
 				var name = Path.GetFileNameWithoutExtension(cardTemplatePath.Name);
 				using var state = Logger.BeginScope(name);
 				Logger.LogDebug("Card type: {name}", name);
-				if (!name.Contains(type)) {
+				if (type != null && !name.Contains(type)) {
 					Logger.LogDebug("Skipping type, does not contain {type}", type);
 					continue;
 				}
