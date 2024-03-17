@@ -55,4 +55,4 @@ This step packs all cards of one type into a single file. If not specified, `/ta
 The result is written to `/output/<target>/<type>.html`.
 
 ## (Optional) Render the target as image
-If you use the `--image` option, tuffCards uses chrome (which is expected to be found at `C:\Program Files\Google\Chrome\Application\chrome.exe`, this will be configurable soon) to take a to take a screenshot. For this to work as expected, you may need to add a comment in the format `<!-- image-size-{typename}:<width>x<height>) -->` or `<!-- image-size:<width>x<height>) -->` in your target template.
+If you use the `--image` option, tuffCards uses [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to take a to take a screenshot.

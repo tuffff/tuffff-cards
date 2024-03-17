@@ -15,7 +15,7 @@ public class Converter {
 		Logger = logger;
 	}
 
-	public async Task Convert(string target, bool image) {
+	public async Task Convert(string target, string type, bool single, bool image) {
 		try {
 			var targetTemplate = GetTargetTemplate(target);
 			var outputDirectory = FolderRepository.GetOutputDirectory(target);
@@ -28,6 +28,10 @@ public class Converter {
 				var name = Path.GetFileNameWithoutExtension(cardTemplatePath.Name);
 				using var state = Logger.BeginScope(name);
 				Logger.LogDebug("Card type: {name}", name);
+				if (!name.Contains(type)) {
+					Logger.LogDebug("Skipping type, does not contain {type}", type);
+					continue;
+				}
 
 				var cardDataFilename = $"{name}.csv";
 				var cardDataPath = Path.Combine(cardTemplatePath.Directory!.FullName, cardDataFilename);
@@ -38,35 +42,48 @@ public class Converter {
 
 				Template cardTemplate;
 				try {
-					cardTemplate = GetCardTemplate(cardTemplatePath, targetTemplate);
+					cardTemplate = GetCardTemplate(cardTemplatePath);
 				}
 				catch (Exception ex) {
 					Logger.LogWarning("Error parsing card type template. Skipping. Message: {message}", ex.Message);
 					continue;
 				}
 
-				var cards = await GetCardData(cardDataPath, parser, cardTemplate);
+				var cards = await RenderCard(cardDataPath, parser, cardTemplate);
 				var cardTypeCss = GetCardTypeCss(cardTemplatePath);
 
 				var model = new WrapperModel {
 					name = name,
-					cards = cards,
 					cardtypecss = cardTypeCss,
 					globaltargetcss = globalTargetCss,
 					scripts = scripts
 				};
-				var outputResult = await CreateCards(model, parser, targetTemplate);
-				var outputPath = Path.Combine(outputDirectory, $"{name}.html");
+
 				try {
-					await WriteTarget(outputPath, cards, outputResult);
+					if (single) {
+						foreach (var (title, card) in cards) {
+							model.cards = new List<string>{ card };
+							var outputResult = await CreateTarget(model, parser, targetTemplate);
+							var cardName = $"{name}_{title}";
+							var outputPath = Path.Combine(outputDirectory, $"{cardName}.html");
+							await WriteTarget(outputPath, outputResult);
+							if (image)
+								await GenerateImage(outputPath, outputDirectory, cardName);
+						}
+						Logger.LogInformation("Created {cardsCount} cards in {outputPath}", cards.Count, outputDirectory);
+					}
+					else {
+						model.cards = cards.Select(c => c.result).ToList();
+						var outputResult = await CreateTarget(model, parser, targetTemplate);
+						var outputPath = Path.Combine(outputDirectory, $"{name}.html");
+						await WriteTarget(outputPath, outputResult);
+						Logger.LogInformation("Created {cardsCount} cards: {outputPath}", cards.Count, outputPath);
+						if (image)
+							await GenerateImage(outputPath, outputDirectory, name);
+					}
 				}
 				catch (Exception ex) {
 					Logger.LogError("Writing output: {message}. Skipping.", ex.Message);
-					continue;
-				}
-
-				if (image) {
-					await GenerateImage(outputPath, outputDirectory, name);
 				}
 			}
 			Logger.LogSuccess("Finished.");
@@ -97,28 +114,36 @@ public class Converter {
 			.EnumerateFiles("*.html", SearchOption.AllDirectories);
 	}
 
-	private static Template GetCardTemplate(FileSystemInfo cardTemplatePath, Template targetTemplate) {
+	private static Template GetCardTemplate(FileSystemInfo cardTemplatePath) {
 		var templateText = File.ReadAllText(cardTemplatePath.FullName);
 		var template = Template.Parse(templateText);
-		if (targetTemplate.HasErrors) throw new InvalidOperationException(targetTemplate.Messages.ToString());
+		if (template.HasErrors) throw new InvalidOperationException(template.Messages.ToString());
 		return template;
 	}
 
-	private async Task<List<string>> GetCardData(string cardData, TuffCardsMarkdownParser parser, Template template) {
-		var cards = new List<string>();
+	private async Task<List<(string firstColumn, string result)>> RenderCard(string cardData, TuffCardsMarkdownParser parser, Template template) {
+		var cards = new List<(string, string)>();
+		var usedNames = new Dictionary<string, int>();
 		using var reader = new StreamReader(cardData);
 		try {
 			var headers = (await reader.ReadLineAsync())?.Split(';');
 			if (headers == null) throw new Exception("Empty header line");
 			while (await reader.ReadLineAsync() is {} line) {
-				var data = headers
-					.Zip(line.Split(';'), (header, row) => new { header, row })
+				var cells = line.Split(';');
+				var title = cells.FirstOrDefault() ?? "card";
+				if (!usedNames.TryAdd(title, 1)) {
+					usedNames[title] += 1;
+					title = $"{title}_{usedNames[title]}";
+				}
+
+                var data = headers
+					.Zip(cells, (header, row) => new { header, row })
 					.ToDictionary(x => x.header, x => parser.Parse(x.row));
 				var scriptObject = new ScriptObject();
 				scriptObject.Import(data);
 				scriptObject.Import("md", new Func<string, string>(parser.Parse));
 				var result = await template.RenderAsync(scriptObject);
-				cards.Add(result);
+				cards.Add((title, result));
 			}
 		}
 		catch (Exception ex) {
@@ -127,7 +152,7 @@ public class Converter {
 		return cards;
 	}
 
-	private static async Task<string> CreateCards(WrapperModel model, TuffCardsMarkdownParser parser, Template targetTemplate) {
+	private static async Task<string> CreateTarget(WrapperModel model, TuffCardsMarkdownParser parser, Template targetTemplate) {
 		var scriptObject = new ScriptObject();
 		scriptObject.Import(model);
 		scriptObject.Import("md", new Func<string, string>(parser.Parse));
@@ -135,9 +160,8 @@ public class Converter {
 		return outputResult;
 	}
 
-	private async Task WriteTarget(string outputPath, IReadOnlyCollection<string> cards, string outputResult) {
+	private async Task WriteTarget(string outputPath, string outputResult) {
 		await using var output = new StreamWriter(outputPath, false);
-		Logger.LogInformation("Created {cardsCount} cards: {outputPath}", cards.Count, outputPath);
 		await output.WriteLineAsync(outputResult);
 	}
 
@@ -188,13 +212,17 @@ public class Converter {
 		Logger.LogDebug("Generating image ... ");
 		try {
 			var imagePath = Path.Combine(outputDirectory, $"{name}.png");
-			var browserFetcher = new BrowserFetcher(SupportedBrowser.Firefox);
-			if (!browserFetcher.GetInstalledBrowsers().Any(b => b.Browser == SupportedBrowser.ChromeHeadlessShell)) {
+			var browserFetcher = new BrowserFetcher(SupportedBrowser.Chrome);
+			if (!browserFetcher.GetInstalledBrowsers().Any(c => c.Browser == SupportedBrowser.Chrome)) {
 				Logger.LogInformation("Getting browser, this make take some time ...");
+				await browserFetcher.DownloadAsync();
 			}
-			await browserFetcher.DownloadAsync();
 			Logger.LogDebug("Launching ...");
-			var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+			var browser = await Puppeteer.LaunchAsync(new LaunchOptions {
+				Headless = true,
+				Browser = SupportedBrowser.Chrome,
+				DefaultViewport = new ViewPortOptions { Width = 1, Height = 1 }
+			});
 			Logger.LogDebug("Navigating ...");
 			var page = await browser.NewPageAsync();
 			await page.GoToAsync(outputPath);
