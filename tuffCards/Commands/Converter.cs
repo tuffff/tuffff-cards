@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using PuppeteerSharp;
 using System.Diagnostics.CodeAnalysis;
 using tuffCards.Repositories;
 
@@ -17,7 +17,7 @@ public class Converter {
 
 	public async Task Convert(string target, bool image) {
 		try {
-			var (targetTemplate, targetTemplateText) = GetTargetTemplate(target);
+			var targetTemplate = GetTargetTemplate(target);
 			var outputDirectory = FolderRepository.GetOutputDirectory(target);
 			FolderRepository.ClearOutputDirectory(target);
 			var parser = MarkdownParserFactory.Build(target);
@@ -66,7 +66,7 @@ public class Converter {
 				}
 
 				if (image) {
-					await GenerateImage(outputPath, outputDirectory, name, targetTemplateText);
+					await GenerateImage(outputPath, outputDirectory, name);
 				}
 			}
 			Logger.LogSuccess("Finished.");
@@ -76,22 +76,20 @@ public class Converter {
 		}
 	}
 
-	private (Template template, string original) GetTargetTemplate(string target) {
-		var targetPath = Path.Combine(FolderRepository.GetTargetDirectory(), $"{target}.html");
-		if (!File.Exists(targetPath)) throw new Exception($"Target file '{target}' not found. (path: {targetPath})");
-
-		Logger.LogInformation("Using target template: {targetPath}", targetPath);
-		string targetTemplateText;
-		Template targetTemplate;
+	private Template GetTargetTemplate(string target) {
 		try {
-			targetTemplateText = File.ReadAllText(targetPath);
-			targetTemplate = Template.Parse(targetTemplateText);
+			var targetPath = Path.Combine(FolderRepository.GetTargetDirectory(), $"{target}.html");
+			if (!File.Exists(targetPath)) throw new Exception($"Target file '{target}' not found. (path: {targetPath})");
+
+			Logger.LogInformation("Using target template: {targetPath}", targetPath);
+			var targetTemplateText = File.ReadAllText(targetPath);
+			var targetTemplate = Template.Parse(targetTemplateText);
 			if (targetTemplate.HasErrors) throw new InvalidOperationException(targetTemplate.Messages.ToString());
+			return targetTemplate;
 		}
 		catch (Exception ex) {
 			throw new Exception($"Error parsing target template: {ex.Message}");
 		}
-		return (targetTemplate, targetTemplateText);
 	}
 
 	private IEnumerable<FileInfo> GetCardTemplatePaths() {
@@ -99,7 +97,7 @@ public class Converter {
 			.EnumerateFiles("*.html", SearchOption.AllDirectories);
 	}
 
-	private static Template GetCardTemplate(FileInfo cardTemplatePath, Template targetTemplate) {
+	private static Template GetCardTemplate(FileSystemInfo cardTemplatePath, Template targetTemplate) {
 		var templateText = File.ReadAllText(cardTemplatePath.FullName);
 		var template = Template.Parse(templateText);
 		if (targetTemplate.HasErrors) throw new InvalidOperationException(targetTemplate.Messages.ToString());
@@ -163,7 +161,7 @@ public class Converter {
 			try {
 				var script = File.ReadAllText(scriptFile.FullName);
 				scripts.Add(script);
-				Logger.LogDebug("Also added script: {scriptFileName} ...", scriptFile.Name);
+				Logger.LogDebug("Added script: {scriptFileName} ...", scriptFile.Name);
 			}
 			catch (Exception ex) {
 				Logger.LogError("Adding script: {message}. Skipping.", ex.Message);
@@ -186,42 +184,26 @@ public class Converter {
 		return string.Empty;
 	}
 
-	private async Task GenerateImage(string outputPath, string outputDirectory, string name, string targetTemplateText) {
+	private async Task GenerateImage(string outputPath, string outputDirectory, string name) {
 		Logger.LogDebug("Generating image ... ");
-		var imagePath = Path.Combine(outputDirectory, $"{name}.png");
-		var imageSize = "1000,1000";
-		var match = Regex.Match(targetTemplateText, @$"<!-- image-size-{name}:(\d+)x(\d+) -->");
-		if (match.Success) {
-			imageSize = $"{match.Groups[1].Value},{match.Groups[2].Value}";
-		}
-		else {
-			match = Regex.Match(targetTemplateText, @"<!-- image-size:(\d+)x(\d+) -->");
-			if (match.Success) {
-				imageSize = $"{match.Groups[1].Value},{match.Groups[2].Value}";
-			}
-		}
-		const string exe = """
-		                   C:\Program Files\Google\Chrome\Application\chrome.exe
-		                   """;
-		var args = $"""
-		            --headless --screenshot="{imagePath}" --window-size="{imageSize}" "{outputPath}"
-		            """;
 		try {
-			var pi = new ProcessStartInfo(exe, args) {
-				CreateNoWindow = true,
-				UseShellExecute = false,
-				RedirectStandardError = true
-			};
-			var process = Process.Start(pi);
-			await process!.WaitForExitAsync();
-			if (process.ExitCode != 0) {
-				throw new Exception(await process.StandardError.ReadToEndAsync());
+			var imagePath = Path.Combine(outputDirectory, $"{name}.png");
+			var browserFetcher = new BrowserFetcher(SupportedBrowser.Firefox);
+			if (!browserFetcher.GetInstalledBrowsers().Any(b => b.Browser == SupportedBrowser.ChromeHeadlessShell)) {
+				Logger.LogInformation("Getting browser, this make take some time ...");
 			}
-
-			Logger.LogInformation("Added image done: {imagePath}", imagePath);
+			await browserFetcher.DownloadAsync();
+			Logger.LogDebug("Launching ...");
+			var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+			Logger.LogDebug("Navigating ...");
+			var page = await browser.NewPageAsync();
+			await page.GoToAsync(outputPath);
+			Logger.LogDebug("Screenshotting ...");
+			await page.ScreenshotAsync(imagePath, new ScreenshotOptions { FullPage = true });
+			Logger.LogInformation("Added image: {imagePath}", imagePath);
 		}
 		catch (Exception ex) {
-			Logger.LogError("Generating image: {message}. Skipping. Command was: \"{exe}\" {args}", ex.Message, exe, args);
+			Logger.LogError("Generating image: {message}. Skipping.", ex.Message);
 		}
 	}
 
