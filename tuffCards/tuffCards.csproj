@@ -11,9 +11,10 @@
     <AssemblyTitle>tuffCards</AssemblyTitle>
     <Description>tuffCards is a small tool to convert html/css/csv templates to cards.</Description>
     <Product>tuffCards</Product>
-    <Copyright>Copyright ©  2024</Copyright>
-    <AssemblyVersion>0.1.%2a</AssemblyVersion>
+    <Copyright>Copyright ©2024</Copyright>
+    <AssemblyFileVersion>0.1.%2a</AssemblyFileVersion>
     <FileVersion>0.1.%2a</FileVersion>
+    <Deterministic>false</Deterministic>
     <PackageProjectUrl>https://github.com/tuffff/tuffff-cards</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/tuffff/tuffff-cards/main/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/tuffff/tuffff-cards</RepositoryUrl>
