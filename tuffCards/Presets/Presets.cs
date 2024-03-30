@@ -27,6 +27,29 @@ public static class Presets {
 
 <script>{{ for script in scripts }}
 	{{ script }}{{ end }}
+
+	fetch(window.location)
+		.then((response) => {
+            return response.text();
+		})
+		.then(original => {
+            var bfr = original;
+            setInterval(function () {
+                fetch(window.location)
+				.then((response) => {
+                    return response.text();
+                }).then(r => {
+                    if (bfr !== r) {
+                        window.location.reload();
+                    } else {
+                        bfr = r;
+                    }
+                });
+            }, 200);
+        })
+		.catch(() => {
+            console.error('Cannot reload local file. Use Firefox or pass "--allow-file-access-from-files" to chrome.')
+		});
 </script>
 
 <style>
@@ -46,7 +69,7 @@ public static class Presets {
 </style>
 """;
 
-	public const string TtsTarget = """
+	public const string SpriteTarget = """
 <div class="wrapper tts {{ name }}">{{ for card in cards }}
 	{{ card }}{{ end }}
 </div>

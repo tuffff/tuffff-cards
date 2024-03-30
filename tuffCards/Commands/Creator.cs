@@ -45,7 +45,7 @@ public class Creator {
 			var targetsDir = FolderRepository.GetTargetDirectory();
 			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.Presets.GlobalTargetCss);
 			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.Presets.DefaultTarget);
-			File.WriteAllText(Path.Combine(targetsDir, "tts.html"), Presets.Presets.TtsTarget);
+			File.WriteAllText(Path.Combine(targetsDir, "sprite.html"), Presets.Presets.SpriteTarget);
 
 			var cardsDir = FolderRepository.GetCardsDirectory();
 			File.WriteAllText(Path.Combine(cardsDir, "actions.html"), Presets.Presets.DefaultActions);

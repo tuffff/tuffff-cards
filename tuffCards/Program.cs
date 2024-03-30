@@ -10,9 +10,12 @@ public class Program {
 		var logLevelArg = new Option<LogLevel>("--log-level", () => LogLevel.Information, "Sets the log level.");
 		var targetArg = new Option<string>("--target", () => "default", "The name of the target file (in /targets).");
 		var cardTypeArg = new Option<string?>("--type", () => null, "Only creates card types where the name contains this argument.");
-		var singleArg = new Option<bool>("--single", () => false, "Creates the images as single files instead. Uses first column for names. Excludes --target.");
+		var batchSizeArg = new Option<int?>("--batch-size", () => null, "Breaks output into multiple parts when they contain more cards than the size.");
+		var singleArg = new Option<bool>("--single", () => false, "Shortcut for \"--batch-size 1\"");
 		var forceArg = new Option<bool>("--force", () => false, "Force the command, ignore warnings.");
 		var generateImageArg = new Option<bool>("--image", () => false, "Creates a png by taking a render after generating the html (with chrome expected at default path). You should specify the size in the target.");
+		var watchFilesArg = new Option<bool>("--watch", () => false, "Watches all used input files and starts another completion on changes.");
+		var createBacksArg = new Option<bool>("--backs", () => false, "Create a card back by filling the template with no data.");
 		var cardTypeNameArg = new Argument<string>("name", "The name of the card type (also the file name).");
 
 		var root = new RootCommand("tuffCards is a small tool to convert html/css/csv templates to cards.");
@@ -20,13 +23,17 @@ public class Program {
 		var convertCmd = new Command("convert", "Converts the cards to html pages.") {
 			targetArg,
 			cardTypeArg,
+			batchSizeArg,
 			singleArg,
 			generateImageArg,
-			logLevelArg
+			logLevelArg,
+			watchFilesArg,
+			createBacksArg
 		};
 		root.AddCommand(convertCmd);
-		convertCmd.SetHandler(async (target, type, single, image, logLevel) => await GetServices(logLevel).GetRequiredService<Converter>().Convert(target, type, single, image),
-			targetArg, cardTypeArg, singleArg, generateImageArg, logLevelArg);
+		convertCmd.SetHandler(async (target, type, batchSize, single, image, watch, createBacks, logLevel) =>
+			await GetServices(logLevel).GetRequiredService<Converter>().Convert(target, type, single ? 1 : batchSize, image, watch, createBacks),
+			targetArg, cardTypeArg, batchSizeArg, singleArg, generateImageArg, watchFilesArg, createBacksArg, logLevelArg);
 
 		var createCmd = new Command("create", "Creates a new, relatively empty project in this folder.") {
 			forceArg,

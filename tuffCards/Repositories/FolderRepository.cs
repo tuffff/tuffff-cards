@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace tuffCards.Repositories;
 
 public class FolderRepository {
@@ -53,6 +55,25 @@ public class FolderRepository {
 
 	public bool IsValidRootFolder() {
 		return Directory.Exists(TargetDirectory) && Directory.Exists(CardDirectory);
+	}
+
+	public string MakeValidFileName(string text, char? replacement = '_')
+	{
+		var sb = new StringBuilder(text.Length);
+		var invalids = Path.GetInvalidFileNameChars();
+		var changed = false;
+		foreach (var c in text) {
+			if (invalids.Contains(c)) {
+				changed = true;
+				var repl = replacement ?? '\0';
+				if (repl != '\0')
+					sb.Append(repl);
+			} else
+				sb.Append(c);
+		}
+		if (sb.Length == 0)
+			return "_";
+		return changed ? sb.ToString() : text;
 	}
 
 	public FolderRepository(string rootPath) {

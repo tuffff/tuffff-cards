@@ -22,7 +22,7 @@ public class TuffCardsMarkdownParser {
 		if (result.LastIndexOf("<p>", StringComparison.InvariantCultureIgnoreCase) == 0 && result.IndexOf("</p>", StringComparison.InvariantCultureIgnoreCase) == result.Length - 5) {
 			result = result.Substring(3, result.Length - 8);
 		}
-		Logger.LogDebug("Converted {md} to {result}", md, result);
+		Logger.LogTrace("Converted {md} to {result}", md, result);
 		return result;
 	}
 
@@ -55,7 +55,7 @@ public class ImageParser : InlineParser {
 		var start = slice.Start;
 		var end = start;
 
-		while (current.IsAlphaNumeric() || current == '_' || current == '_')
+		while (current.IsAlphaNumeric() || current == '-' || current == '_')
 		{
 			end = slice.Start;
 			current = slice.NextChar();
@@ -140,10 +140,15 @@ public class ImageRenderer : HtmlObjectRenderer<Image> {
 			renderer.Write($"<em class=\"{cssClass}\">{obj.Name}</em>");
 		}
 		else {
-			var fileName = $"{cssClass}-{file.Name}";
-			var outputPath = Path.Combine(Options.OutputPath, fileName);
-			if (!File.Exists(outputPath)) File.Copy(file.FullName, outputPath);
-			renderer.Write($"<img class=\"{cssClass}\" src=\"{fileName}\" alt=\"{obj.Name}\" />");
+			if (file.Extension == ".svg") {
+				renderer.Write(File.ReadAllText(file.FullName));
+			}
+			else {
+				var fileName = $"{cssClass}-{file.Name}";
+				var outputPath = Path.Combine(Options.OutputPath, fileName);
+				if (!File.Exists(outputPath)) File.Copy(file.FullName, outputPath);
+				renderer.Write($"<img class=\"{cssClass}\" src=\"{fileName}\" alt=\"{obj.Name}\" />");
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using PuppeteerSharp;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Linq;
 using tuffCards.Repositories;
 
 namespace tuffCards.Commands;
@@ -15,8 +16,11 @@ public class Converter {
 		Logger = logger;
 	}
 
-	public async Task Convert(string target, string? type, bool single, bool image) {
+	public async Task Convert(string target, string? type, int? batchSize, bool generateImage, bool watchFiles, bool createBacks) {
 		try {
+			if (batchSize.HasValue && batchSize < 1) {
+				throw new Exception("Batch size cannot be < 1");
+			}
 			var targetTemplate = GetTargetTemplate(target);
 			var outputDirectory = FolderRepository.GetOutputDirectory(target);
 			FolderRepository.ClearOutputDirectory(target);
@@ -60,33 +64,36 @@ public class Converter {
 				};
 
 				try {
-					if (single) {
-						foreach (var (title, card) in cards) {
-							model.cards = new List<string>{ card };
-							var outputResult = await CreateTarget(model, parser, targetTemplate);
-							var cardName = $"{name}_{title}";
-							var outputPath = Path.Combine(outputDirectory, $"{cardName}.html");
-							await WriteTarget(outputPath, outputResult);
-							if (image)
-								await GenerateImage(outputPath, outputDirectory, cardName);
-						}
-						Logger.LogInformation("Created {cardsCount} cards in {outputPath}", cards.Count, outputDirectory);
+					var batchType = batchSize switch {
+						1 => BatchType.Single,
+						{} x when x < cards.Count => BatchType.Batch,
+						_ => BatchType.All
+					};
+					foreach (var (batch, batchIndex) in cards.Chunk(batchSize ?? cards.Count).Select((b, i) => (b.ToList(), i))) {
+						model.cards = batch.Select(c => c.result).ToList();
+						var outputResult = await PrepareTargetModel(model, parser, targetTemplate);
+						var cardName = batchType switch {
+							BatchType.All => $"{name}",
+							BatchType.Single => $"{name} {FolderRepository.MakeValidFileName(batch.First().firstColumn)}",
+							_ => $"{name} {batchIndex}"
+						};
+						var outputPath = await CreateTarget(generateImage, outputDirectory, cardName, outputResult);
+						if (batchType != BatchType.All)
+							Logger.LogDebug("Created {count} card(s): {outputPath}", batch.Count, outputPath);
 					}
-					else {
-						model.cards = cards.Select(c => c.result).ToList();
-						var outputResult = await CreateTarget(model, parser, targetTemplate);
-						var outputPath = Path.Combine(outputDirectory, $"{name}.html");
-						await WriteTarget(outputPath, outputResult);
-						Logger.LogInformation("Created {cardsCount} cards: {outputPath}", cards.Count, outputPath);
-						if (image)
-							await GenerateImage(outputPath, outputDirectory, name);
+					if (createBacks) {
+						await CreateBacks(generateImage, parser, cardTemplate, model, targetTemplate, outputDirectory, name);
 					}
+					Logger.LogInformation("Created {count} cards in {outputPath}", cards.Count, outputDirectory);
 				}
 				catch (Exception ex) {
 					Logger.LogError("Writing output: {message}. Skipping.", ex.Message);
 				}
 			}
 			Logger.LogSuccess("Finished.");
+			if (watchFiles) {
+				WatchFiles(target, type, batchSize, generateImage, createBacks);
+			}
 		}
 		catch (Exception ex) {
 			Logger.LogError("While converting: {Message}", ex.Message);
@@ -152,7 +159,15 @@ public class Converter {
 		return cards;
 	}
 
-	private static async Task<string> CreateTarget(WrapperModel model, TuffCardsMarkdownParser parser, Template targetTemplate) {
+	private async Task<string> CreateTarget(bool generateImage, string outputDirectory, string cardName, string outputResult) {
+		var outputPath = Path.Combine(outputDirectory, $"{cardName}.html");
+		await WriteTarget(outputPath, outputResult);
+		if (generateImage)
+			await GenerateImage(outputPath, outputDirectory, cardName);
+		return outputPath;
+	}
+
+	private static async Task<string> PrepareTargetModel(WrapperModel model, TuffCardsMarkdownParser parser, Template targetTemplate) {
 		var scriptObject = new ScriptObject();
 		scriptObject.Import(model);
 		scriptObject.Import("md", new Func<string, string>(parser.Parse));
@@ -235,6 +250,48 @@ public class Converter {
 		}
 	}
 
+	private void WatchFiles(string target, string? type, int? batchSize, bool image, bool createBacks) {
+		var cardsWatcher = type != null
+			? new FileSystemWatcher { Filters = { $"{target}.csv", $"{target}.html", $"{target}.css" } }
+			: new FileSystemWatcher { Filters = { "*.csv", "*.html", "*.css" } };
+		cardsWatcher.Path = FolderRepository.GetCardsDirectory();
+		cardsWatcher.EnableRaisingEvents = true;
+		var cardsEvents = Observable
+			.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+				h => cardsWatcher.Changed += h,
+				h => cardsWatcher.Changed -= h)
+			.Select(e => e.EventArgs);
+
+		var targetWatcher = new FileSystemWatcher {
+			Path = FolderRepository.GetTargetDirectory(),
+			EnableRaisingEvents = true,
+			Filters = { $"{target}.html", "global.css" }
+		};
+		var targetEvents = Observable
+			.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+				h => targetWatcher.Changed += h,
+				h => targetWatcher.Changed -= h)
+			.Select(e => e.EventArgs);
+
+		var observable = cardsEvents.Merge(targetEvents);
+		observable.Throttle(TimeSpan.FromMilliseconds(200)).Subscribe(arg => {
+			Logger.LogDebug("File changed: {path}", arg.FullPath);
+			Convert(target, type, batchSize, image, false, createBacks).Wait();
+		Logger.LogSuccess("Still watching. Press q to quit.");
+		});
+		Logger.LogSuccess("Watching files. Press q to quit.");
+		while (Console.ReadKey().KeyChar != 'q') {}
+	}
+
+	private async Task CreateBacks(bool generateImage, TuffCardsMarkdownParser parser, Template cardTemplate, WrapperModel model, Template targetTemplate, string outputDirectory, string name) {
+		var backContent = new ScriptObject();
+		backContent.Import("md", new Func<string, string>(parser.Parse));
+		var backCardResult = await cardTemplate.RenderAsync(backContent);
+		model.cards = new List<string> { backCardResult };
+		var backOutputResult = await PrepareTargetModel(model, parser, targetTemplate);
+		await CreateTarget(generateImage, outputDirectory, $"{name} back", backOutputResult);
+	}
+
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
 	[SuppressMessage("ReSharper", "IdentifierTypo")]
 	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
@@ -244,5 +301,11 @@ public class Converter {
 		public string cardtypecss { get; set; } = "";
 		public string globaltargetcss { get; set; } = "";
 		public IList<string> scripts { get; set; } = new List<string>();
+	}
+
+	private enum BatchType {
+		All,
+		Single,
+		Batch
 	}
 }

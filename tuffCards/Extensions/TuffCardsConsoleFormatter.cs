@@ -10,6 +10,8 @@ public class TuffCardsConsoleFormatter : ConsoleFormatter
 	public override void Write<TState>(in LogEntry<TState> logEntry, IExternalScopeProvider? scopeProvider, TextWriter textWriter)
 	{
 		var message = logEntry.Formatter(logEntry.State, logEntry.Exception);
+		message = message.Replace("<success>", "\x1B[1m\x1B[32m").Replace("</success>", "\x1B[39m\x1B[22m");
+
 		var logLevelColors = GetLogLevelConsoleColors(logEntry.LogLevel);
 
 		textWriter.Write(DateTime.Now.ToString("HH:mm:ss"));
