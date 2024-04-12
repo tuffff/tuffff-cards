@@ -150,7 +150,8 @@ public class Converter {
 				scriptObject.Import(data);
 				scriptObject.Import("md", new Func<string, string>(parser.Parse));
 				var result = await template.RenderAsync(scriptObject);
-				cards.Add((title, result));
+				var copies = data.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
+				cards.AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));
 			}
 		}
 		catch (Exception ex) {
