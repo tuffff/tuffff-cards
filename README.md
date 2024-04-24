@@ -26,6 +26,7 @@ tuffCards convert
 - Take a look at your cards in `/output/default` - just open the file in your browser
 - To export your cards in a specific format, copy `/targets/default.html` to a new file and adjust, then convert with `--target <target>`
 - To create an image from your target, use `--image` - you may need to adjust the size (see below)
+- For a continued editing workflow, keep both the default html open and the terminal with `tuffCards convert --watch`. Each written change in one of the read files (not new ones) should be visible in the browser relatively quickly.
 
 # How it works
 tuffCards does three or four templating steps:
