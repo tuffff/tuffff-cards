@@ -20,7 +20,7 @@ public class Program {
 
 		var root = new RootCommand("tuffCards is a small tool to convert html/css/csv templates to cards.");
 
-		var convertCmd = new Command("convert", "Converts the cards to html pages.") {
+		var convertCmd = new Command("convert", "Converts the cards to html pages. Special column names are: \"Deck\" and \"Copies\".") {
 			targetArg,
 			cardTypeArg,
 			batchSizeArg,

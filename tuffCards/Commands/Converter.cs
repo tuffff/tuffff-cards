@@ -2,6 +2,7 @@ using PuppeteerSharp;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using tuffCards.Repositories;
+using tuffLib.Dictionaries;
 
 namespace tuffCards.Commands;
 
@@ -18,7 +19,7 @@ public class Converter {
 
 	public async Task Convert(string target, string? type, int? batchSize, bool generateImage, bool watchFiles, bool createBacks) {
 		try {
-			if (batchSize.HasValue && batchSize < 1) {
+			if (batchSize is < 1) {
 				throw new Exception("Batch size cannot be < 1");
 			}
 			var targetTemplate = GetTargetTemplate(target);
@@ -28,63 +29,70 @@ public class Converter {
 			var globalTargetCss = GetGlobalTargetCss();
 			var scripts = GetScripts();
 
-			foreach (var cardTemplatePath in GetCardTemplatePaths()) {
-				var name = Path.GetFileNameWithoutExtension(cardTemplatePath.Name);
-				using var state = Logger.BeginScope(name);
-				Logger.LogDebug("Card type: {name}", name);
-				if (type != null && !name.Contains(type)) {
+			foreach (var templatePath in GetCardTemplatePaths()) {
+				var templateName = Path.GetFileNameWithoutExtension(templatePath.Name);
+				using var state = Logger.BeginScope(templateName);
+				Logger.LogDebug("Card type: {name}", templateName);
+				if (type != null && !templateName.Contains(type)) {
 					Logger.LogDebug("Skipping type, does not contain {type}", type);
 					continue;
 				}
 
-				var cardDataFilename = $"{name}.csv";
-				var cardDataPath = Path.Combine(cardTemplatePath.Directory!.FullName, cardDataFilename);
+				var cardDataFilename = $"{templateName}.csv";
+				var cardDataPath = Path.Combine(templatePath.Directory!.FullName, cardDataFilename);
 				if (!File.Exists(cardDataPath)) {
-					Logger.LogWarning("Card data file {cardDataPath} missing, skipping.", cardTemplatePath);
+					Logger.LogWarning("Card data file {cardDataPath} missing, skipping.", templatePath);
 					continue;
 				}
 
 				Template cardTemplate;
 				try {
-					cardTemplate = GetCardTemplate(cardTemplatePath);
+					cardTemplate = GetCardTemplate(templatePath);
 				}
 				catch (Exception ex) {
 					Logger.LogWarning("Error parsing card type template. Skipping. Message: {message}", ex.Message);
 					continue;
 				}
 
-				var cards = await RenderCard(cardDataPath, parser, cardTemplate);
-				var cardTypeCss = GetCardTypeCss(cardTemplatePath);
+				var decks = await RenderData(cardTemplate, templateName, cardDataPath, parser);
+				var cardTypeCss = GetCardTypeCss(templatePath);
 
 				var model = new WrapperModel {
-					name = name,
+					name = templateName,
 					cardtypecss = cardTypeCss,
 					globaltargetcss = globalTargetCss,
 					scripts = scripts
 				};
 
 				try {
-					var batchType = batchSize switch {
-						1 => BatchType.Single,
-						{} x when x < cards.Count => BatchType.Batch,
-						_ => BatchType.All
-					};
-					foreach (var (batch, batchIndex) in cards.Chunk(batchSize ?? cards.Count).Select((b, i) => (b.ToList(), i))) {
-						model.cards = batch.Select(c => c.result).ToList();
-						var outputResult = await PrepareTargetModel(model, parser, targetTemplate);
-						var cardName = batchType switch {
-							BatchType.All => $"{name}",
-							BatchType.Single => $"{name} {FolderRepository.MakeValidFileName(batch.First().firstColumn)}",
-							_ => $"{name} {batchIndex}"
+					foreach (var deck in decks) {
+						var batchType = batchSize switch {
+							1 => BatchType.Single,
+							{} x when x < deck.cards.Count => BatchType.Batch,
+							_ => BatchType.All
 						};
-						var outputPath = await CreateTarget(generateImage, outputDirectory, cardName, outputResult);
-						if (batchType != BatchType.All)
-							Logger.LogDebug("Created {count} card(s): {outputPath}", batch.Count, outputPath);
+						foreach (var (batch, batchIndex) in deck.cards.Chunk(batchSize ?? deck.cards.Count).Select((b, i) => (b.ToList(), i))) {
+							model.cards = batch.Select(c => c.content).ToList();
+							var outputResult = await PrepareTargetModel(model, parser, targetTemplate);
+							var batchName = batchType switch {
+								BatchType.All => $"{deck.deckName}",
+								BatchType.Single => $"{deck.deckName} {FolderRepository.MakeValidFileName(batch.First().title)}",
+								_ => $"{deck.deckName} {batchIndex}"
+							};
+							var outputPath = await CreateTarget(generateImage, outputDirectory, batchName, outputResult);
+							if (batchType != BatchType.All)
+								Logger.LogDebug("Created {count} card(s): {outputPath}", batch.Count, outputPath);
+						}
+						if (createBacks) {
+							await CreateBacks(generateImage, parser, cardTemplate, model, targetTemplate, outputDirectory, deck.deckName);
+						}
 					}
-					if (createBacks) {
-						await CreateBacks(generateImage, parser, cardTemplate, model, targetTemplate, outputDirectory, name);
+					if (decks.Count == 1) {
+						Logger.LogInformation("Created {count} cards", decks[0].cards.Count);
 					}
-					Logger.LogInformation("Created {count} cards in {outputPath}", cards.Count, outputDirectory);
+					else {
+						Logger.LogInformation("Created {cardCount} cards in {deckCount} decks", decks.Sum(d => d.cards.Count), decks.Count);
+					}
 				}
 				catch (Exception ex) {
 					Logger.LogError("Writing output: {message}. Skipping.", ex.Message);
@@ -128,9 +136,11 @@ public class Converter {
 		return template;
 	}
 
-	private async Task<List<(string firstColumn, string result)>> RenderCard(string cardData, TuffCardsMarkdownParser parser, Template template) {
-		var cards = new List<(string, string)>();
+	private async Task<List<(string deckName, List<(string title, string content)> cards)>>
+		RenderData(Template template, string templateName, string cardData, TuffCardsMarkdownParser parser) {
 		var usedNames = new Dictionary<string, int>();
+		var decks = new DefaultValueDictionary<string, List<(string title, string content)>>(
+			() => new List<(string title, string content)>());
 		using var reader = new StreamReader(cardData);
 		try {
 			var headers = (await reader.ReadLineAsync())?.Split(';');
@@ -151,20 +161,22 @@ public class Converter {
 				scriptObject.Import("md", new Func<string, string>(parser.Parse));
 				var result = await template.RenderAsync(scriptObject);
 				var copies = data.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
-				cards.AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));
+				var deckName = data.GetValueOrDefault("Deck") ?? templateName;
+				Logger.LogDebug("Adding card {cardName} to deck {deckName}", title, deckName);
+				decks[deckName].AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));
 			}
 		}
 		catch (Exception ex) {
 			Logger.LogError("Parsing card data: {message}. Skipping.", ex.Message);
 		}
-		return cards;
+		return decks.Select(kv => (kv.Key, kv.Value)).ToList();
 	}
 
-	private async Task<string> CreateTarget(bool generateImage, string outputDirectory, string cardName, string outputResult) {
-		var outputPath = Path.Combine(outputDirectory, $"{cardName}.html");
+	private async Task<string> CreateTarget(bool generateImage, string outputDirectory, string deckName, string outputResult) {
+		var outputPath = Path.Combine(outputDirectory, $"{deckName}.html");
 		await WriteTarget(outputPath, outputResult);
 		if (generateImage)
-			await GenerateImage(outputPath, outputDirectory, cardName);
+			await GenerateImage(outputPath, outputDirectory, deckName);
 		return outputPath;
 	}
 
@@ -229,7 +241,7 @@ public class Converter {
 		try {
 			var imagePath = Path.Combine(outputDirectory, $"{name}.png");
 			var browserFetcher = new BrowserFetcher(SupportedBrowser.Chrome);
-			if (!browserFetcher.GetInstalledBrowsers().Any(c => c.Browser == SupportedBrowser.Chrome)) {
+			if (browserFetcher.GetInstalledBrowsers().All(c => c.Browser != SupportedBrowser.Chrome)) {
 				Logger.LogInformation("Getting browser, this make take some time ...");
 				await browserFetcher.DownloadAsync();
 			}
