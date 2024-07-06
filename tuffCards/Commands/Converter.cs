@@ -246,13 +246,13 @@ public class Converter {
 				await browserFetcher.DownloadAsync();
 			}
 			Logger.LogDebug("Launching ...");
-			var browser = await Puppeteer.LaunchAsync(new LaunchOptions {
+			await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions {
 				Headless = true,
 				Browser = SupportedBrowser.Chrome,
 				DefaultViewport = new ViewPortOptions { Width = 1, Height = 1 }
 			});
 			Logger.LogDebug("Navigating ...");
-			var page = await browser.NewPageAsync();
+			await using var page = await browser.NewPageAsync();
 			await page.GoToAsync(outputPath);
 			Logger.LogDebug("Screenshotting ...");
 			await page.ScreenshotAsync(imagePath, new ScreenshotOptions { FullPage = true });
