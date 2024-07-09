@@ -141,7 +141,11 @@ public class ImageRenderer : HtmlObjectRenderer<Image> {
 		}
 		else {
 			if (file.Extension == ".svg") {
-				renderer.Write(File.ReadAllText(file.FullName));
+				var svg = File.ReadAllText(file.FullName).AsSpan();
+				renderer.Write(svg[..5]);
+				renderer.Write($"class=\"{cssClass}\" ");
+				renderer.Write(" ");
+				renderer.Write(svg[5..]);
 			}
 			else {
 				var fileName = $"{cssClass}-{file.Name}";
