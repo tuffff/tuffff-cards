@@ -146,6 +146,8 @@ public class Converter {
 			var headers = (await reader.ReadLineAsync())?.Split(';');
 			if (headers == null) throw new Exception("Empty header line");
 			while (await reader.ReadLineAsync() is {} line) {
+				if (line.StartsWith("//"))
+					continue;
 				var cells = line.Split(';');
 				var title = cells.FirstOrDefault() ?? "card";
 				if (!usedNames.TryAdd(title, 1)) {
