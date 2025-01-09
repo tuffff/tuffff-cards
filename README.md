@@ -32,7 +32,8 @@ tuffCards convert
 tuffCards does three or four templating steps:
 
 ## Parse Markdown from `/cards/<type>.csv`
-The table is expected to be a semicolon-separated csv file that represents the card data. The header-line defines the name of the fields (use alphanumeric and - or _). By default, each content-row will result in one card.
+The table is expected to be a csv (I default to semicolon-separated) file that represents the card data. This is parsed with [Sep](https://github.com/nietras/Sep), with `Unescape=true`.
+The header-line defines the name of the fields (use alphanumeric and `-` or `_`). By default, each content-row will result in one card.
 
 The content of each field is parsed as Markdown with [Markdig](https://github.com/xoofx/markdig). There are two custom commands:
 - `{iconname}` will result in an image with the css-class `icon` and the first file from the `/icons` folder in the format `iconname.anything`. If no file is found, `iconname` will just show up (and a warning appears).
