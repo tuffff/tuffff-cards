@@ -11,17 +11,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test/GlobalUsings.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/ProcessHelper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/SmokeTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards.sln" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" afterDir="false" />
+    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="Add smoke test, fix example, use Sep for parsing csv.">
       <change beforePath="$PROJECT_DIR$/tuffCards/Commands/Converter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Commands/Converter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards/tuffCards.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/tuffCards.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -174,7 +165,7 @@
       <workItem from="1720284105156" duration="2765000" />
       <workItem from="1720543945411" duration="2577000" />
       <workItem from="1721726134718" duration="3000" />
-      <workItem from="1736364431334" duration="9004000" />
+      <workItem from="1736364431334" duration="9047000" />
     </task>
     <task id="LOCAL-00001" summary="Initial">
       <option name="closed" value="true" />
@@ -416,7 +407,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720544754928</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="Add smoke test, fix example, use Sep for parsing csv.">
+      <option name="closed" value="true" />
+      <created>1736388942728</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1736388942728</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -449,7 +448,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Split css, improved example" />
     <MESSAGE value="Add Scripts, Global css and Screenshots" />
     <MESSAGE value="Improve project creation" />
     <MESSAGE value="Cleanup" />
@@ -474,6 +472,7 @@
     <MESSAGE value="Implement async disposal for browser and page objects&#10;&#10;Updated the Puppeteer launch code to use 'await using' for the browser and page objects. This ensures that these resources are properly cleaned up as soon as they're no longer needed, improving performance and reducing the risk of resource leaks." />
     <MESSAGE value="Ignore lines starting with //" />
     <MESSAGE value="Fix examples" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix examples" />
+    <MESSAGE value="Add smoke test, fix example, use Sep for parsing csv." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add smoke test, fix example, use Sep for parsing csv." />
   </component>
 </project>

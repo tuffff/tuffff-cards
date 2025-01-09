@@ -161,7 +161,7 @@ public class Converter {
 				scriptObject.Import(data);
 				scriptObject.Import("md", new Func<string, string>(parser.Parse));
 				var result = await template.RenderAsync(scriptObject);
-				var copies = data!.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
+				var copies = data.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
 				var deckName = data.GetValueOrDefault("Deck") ?? templateName;
 				Logger.LogDebug("Adding card {cardName} to deck {deckName}", title, deckName);
 				decks[deckName].AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));
