@@ -11,14 +11,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test/ExampleTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/IOHelper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/TemporaryDirectory.cs" afterDir="false" />
+    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="Improve test coverage&#10;&#10;Remove extra space for svgas">
+      <change afterPath="$PROJECT_DIR$/tuffCards/Markdown/Image.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tuffCards/Markdown/ImageExtension.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tuffCards/Markdown/ImageOptions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tuffCards/Markdown/ImageParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tuffCards/Markdown/ImageRenderer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tuffCards/Markdown/MarkdownPipelineExtension.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/ProcessHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/SmokeTest.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards/Commands/Creator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Commands/Creator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,13 +54,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.DependencyInjection/src/ServiceProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Abstractions/src/LogEntry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Abstractions/src/LoggerExtensions.cs" root0="SKIP_HIGHLIGHTING" />
@@ -74,11 +68,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d74d9e7bce6e2a36a52c4e51beca6212c17451e6eee431c7316646edf168/Puppeteer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88226a353f9286b5ab68d4171865832bcdcae9aa28e9781c8951ab94f765/IBrowser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e393d6469890b2e6e96dd7d52a8bdc6a3b8de784d181e6d3dbdcc97e6f4a4/TrueException.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Commands/Converter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Markdown/TuffCardsMarkdownParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Presets/Presets.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -181,7 +172,7 @@
       <workItem from="1720543945411" duration="2577000" />
       <workItem from="1721726134718" duration="3000" />
       <workItem from="1736364431334" duration="13008000" />
-      <workItem from="1736429349949" duration="2868000" />
+      <workItem from="1736429349949" duration="4238000" />
     </task>
     <task id="LOCAL-00001" summary="Initial">
       <option name="closed" value="true" />
@@ -439,7 +430,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736388984853</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Improve test coverage&#10;&#10;Remove extra space for svgas">
+      <option name="closed" value="true" />
+      <created>1736432377978</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1736432377978</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -472,7 +471,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Improve project creation" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Add icon" />
     <MESSAGE value="Change Icon/Images to {/{{" />
@@ -497,6 +495,7 @@
     <MESSAGE value="Fix examples" />
     <MESSAGE value="Add smoke test, fix example, use Sep for parsing csv." />
     <MESSAGE value="Forgot to remove a !" />
-    <option name="LAST_COMMIT_MESSAGE" value="Forgot to remove a !" />
+    <MESSAGE value="Improve test coverage&#10;&#10;Remove extra space for svgas" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improve test coverage&#10;&#10;Remove extra space for svgas" />
   </component>
 </project>
