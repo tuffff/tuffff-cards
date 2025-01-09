@@ -26,8 +26,8 @@ tuffCards convert
 - Take a look at your cards in `/output/default` - just open the file in your browser
 - To export your cards in a specific format, copy `/targets/default.html` to a new file and adjust, then convert with `--target <target>`
 - To create an image from your target, use `--image` - you may need to adjust the size (see below)
-- For a continued editing workflow, keep both the default html open and the terminal with `tuffCards convert --watch`. Each written change in one of the read files (not new ones though) should be visible in the browser relatively quickly). This requires JS permission for local files, which may not be enabled in your browser. Please check your browser console if you run into problems.
-- If you want to import your cards into [Tabletop Simulator (TTS)](https://www.tabletopsimulator.com/), the `sprite` is already there. Convert with `tuffCards --target sprite --image` and import into a card deck in TTS; you just need to set the amount of total cards and the number of horizontal cards (10).
+- For a continuous editing workflow, keep both the default html open and the terminal with `tuffCards convert --watch`. Each written change in one of the read files (not new ones though) should be visible in the browser relatively quickly). This requires JS permission for local files, which may not be enabled in your browser. Please check your browser console if you run into problems.
+- If you want to import your cards into [Tabletop Simulator (TTS)](https://www.tabletopsimulator.com/), the `sprite` is already there. Convert with `tuffCards --target sprite --image` and import into a card deck in TTS; you just need to set the amount of total cards and the number of cards in a row (10).
 
 # How it works
 tuffCards does three or four templating steps:
@@ -40,7 +40,7 @@ The content of each field is parsed as Markdown with [Markdig](https://github.co
 - `{iconname}` will result in an image with the css-class `icon` and the first file from the `/icons` folder in the format `iconname.anything`. If no file is found, `iconname` will just show up (and a warning appears in your terminal).
 - `{{imagename}}` will do the same, but with the css-class `image` and from the folder `/images`.
 
-There are some special header names that get additional handling in addition to being available in the template:
+There are two special header names that get additional handling in addition to being available in the template:
 - `Copies` means the content is parsed as a number and the card in this line is added that many times.
 - `Deck` splits one file in multiple decks, of course each using the same template.
 
@@ -63,3 +63,9 @@ The result is written to `/output/<target>/<type>.html`.
 
 ## (Optional) Render the target as image
 If you use the `--image` option, tuffCards uses [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to take a to take a screenshot.
+
+# Project status and Contribution
+
+I created tuffCards for my own usecase and have used it for a while. It should be stable enough for most usecases. If you do not find recent updates, it's most likely because I'm not missing features.
+
+If there is any feature you are missing or you have any suggestion or question, feel free to open an Issue or PR.
