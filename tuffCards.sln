@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tuffCards", "tuffCards\tuffCards.csproj", "{5278CC35-D6BD-4E84-BCE9-EFAF89F3FB4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,6 +14,10 @@ Global
 		{5278CC35-D6BD-4E84-BCE9-EFAF89F3FB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5278CC35-D6BD-4E84-BCE9-EFAF89F3FB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5278CC35-D6BD-4E84-BCE9-EFAF89F3FB4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

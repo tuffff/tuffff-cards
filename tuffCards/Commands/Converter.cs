@@ -1,3 +1,4 @@
+using nietras.SeparatedValues;
 using PuppeteerSharp;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
@@ -141,28 +142,26 @@ public class Converter {
 		var usedNames = new Dictionary<string, int>();
 		var decks = new DefaultValueDictionary<string, List<(string title, string content)>>(
 			() => new List<(string title, string content)>());
-		using var reader = new StreamReader(cardData);
+		using var reader = Sep.Reader(o => o with { Unescape = true}).FromFile(cardData);
 		try {
-			var headers = (await reader.ReadLineAsync())?.Split(';');
-			if (headers == null) throw new Exception("Empty header line");
-			while (await reader.ReadLineAsync() is {} line) {
-				if (line.StartsWith("//"))
-					continue;
-				var cells = line.Split(';');
-				var title = cells.FirstOrDefault() ?? "card";
-				if (!usedNames.TryAdd(title, 1)) {
-					usedNames[title] += 1;
-					title = $"{title}_{usedNames[title]}";
-				}
-
-                var data = headers
-					.Zip(cells, (header, row) => new { header, row })
-					.ToDictionary(x => x.header, x => parser.Parse(x.row));
+			foreach (var (data, title) in reader.Enumerate(row => {
+					if (row.Span.Length == 0 || row.Span.StartsWith("//"))
+						return (new(), "");
+					var title = row[0].ToString();
+					if (!usedNames.TryAdd(title, 1)) {
+						usedNames[title] += 1;
+						title = $"{title}_{usedNames[title]}";
+					}
+					var dict = new Dictionary<string, string>();
+					foreach (var header in reader.Header.ColNames)
+						dict[header] = parser.Parse(row[header].ToString());
+					return (dict, title);
+				}).Where(d => d.dict.Count != 0)) {
 				var scriptObject = new ScriptObject();
 				scriptObject.Import(data);
 				scriptObject.Import("md", new Func<string, string>(parser.Parse));
 				var result = await template.RenderAsync(scriptObject);
-				var copies = data.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
+				var copies = data!.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
 				var deckName = data.GetValueOrDefault("Deck") ?? templateName;
 				Logger.LogDebug("Adding card {cardName} to deck {deckName}", title, deckName);
 				decks[deckName].AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));

@@ -11,11 +11,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="Ignore lines starting with //">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/csv-editor.xml" beforeDir="false" />
+    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/test/GlobalUsings.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/ProcessHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/SmokeTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/projectSettingsUpdater.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards/Presets/Presets.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Presets/Presets.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards.sln" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards/Commands/Converter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Commands/Converter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards/tuffCards.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/tuffCards.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,16 +55,27 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.DependencyInjection/src/ServiceProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Abstractions/src/LogEntry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Abstractions/src/LoggerExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Console/src/ConsoleFormatter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Console/src/SimpleConsoleFormatterOptions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/IO/TextWriter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3f321d6671ef5bdde79d24ff1255eae2ab21d8b4cb6f4611fd0a7246730d24b/SepReaderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/541bfd18a7ca708680ac6d346d392411c2311d8cf9629dd4851c39659bc85/IPage.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/794c1fb2357a466a1f872816fdae7380eebb48193918e1647211f271609b64/SepReader.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/999ae9cc4ab7b7cfbc5080803e994426e97fd9d87c5b1f44544a799bc114/StringAsserts.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d74d9e7bce6e2a36a52c4e51beca6212c17451e6eee431c7316646edf168/Puppeteer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88226a353f9286b5ab68d4171865832bcdcae9aa28e9781c8951ab94f765/IBrowser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e393d6469890b2e6e96dd7d52a8bdc6a3b8de784d181e6d3dbdcc97e6f4a4/TrueException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/tuffCards/Commands/Converter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/tuffCards/Presets/Presets.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -79,34 +96,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Project.TuffCards.executor&quot;: &quot;Run&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Publish to folder.Publish tuffCards to folder.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.C#&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\sp\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\sp\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\sp\\AppData\\Local\\Symbols\\src&quot;
-    ]
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Project.TuffCards.executor": "Run",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Publish to folder.Publish tuffCards to folder.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "cf6fb342-292a-486c-a873-c9aae20bbb29.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.sourceCode.C#",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="Publish to folder.Publish tuffCards to folder">
+}]]></component>
+  <component name="RunManager" selected=".NET Project.TuffCards">
     <configuration name="TuffCards" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/tuffCards/bin/Debug/net8.0/win-x64/tuffCards.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -161,7 +172,9 @@
       <workItem from="1718698620122" duration="3305000" />
       <workItem from="1719500143446" duration="2744000" />
       <workItem from="1720284105156" duration="2765000" />
-      <workItem from="1720543945411" duration="692000" />
+      <workItem from="1720543945411" duration="2577000" />
+      <workItem from="1721726134718" duration="3000" />
+      <workItem from="1736364431334" duration="9004000" />
     </task>
     <task id="LOCAL-00001" summary="Initial">
       <option name="closed" value="true" />
@@ -395,7 +408,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720543969130</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Fix examples">
+      <option name="closed" value="true" />
+      <created>1720544754928</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1720544754928</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -428,7 +449,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="More async" />
     <MESSAGE value="Split css, improved example" />
     <MESSAGE value="Add Scripts, Global css and Screenshots" />
     <MESSAGE value="Improve project creation" />
@@ -453,6 +473,7 @@
     <MESSAGE value="Allow split via deck column" />
     <MESSAGE value="Implement async disposal for browser and page objects&#10;&#10;Updated the Puppeteer launch code to use 'await using' for the browser and page objects. This ensures that these resources are properly cleaned up as soon as they're no longer needed, improving performance and reducing the risk of resource leaks." />
     <MESSAGE value="Ignore lines starting with //" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ignore lines starting with //" />
+    <MESSAGE value="Fix examples" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix examples" />
   </component>
 </project>
