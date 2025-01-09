@@ -20,6 +20,7 @@ public class Creator {
 			var targetsDir = FolderRepository.GetTargetDirectory();
 			File.WriteAllText(Path.Combine(targetsDir, "global.css"), Presets.Presets.GlobalTargetCss);
 			File.WriteAllText(Path.Combine(targetsDir, "default.html"), Presets.Presets.DefaultTarget);
+			File.WriteAllText(Path.Combine(targetsDir, "sprite.html"), Presets.Presets.SpriteTarget);
 
 			FolderRepository.GetCardsDirectory();
 			FolderRepository.GetImageDirectory();
