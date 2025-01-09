@@ -20,6 +20,6 @@ public sealed class TemporaryDirectory : IDisposable {
 
 	public void Dispose() {
 		Directory.SetCurrentDirectory(OldCurrentDirectory);
-		// Directory.Delete(FolderPath, true);
+		Directory.Delete(FolderPath, true);
 	}
 }

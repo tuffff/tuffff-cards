@@ -11,13 +11,14 @@
     <AssemblyTitle>tuffCards</AssemblyTitle>
     <Description>tuffCards is a small tool to convert html/css/csv templates to cards.</Description>
     <Product>tuffCards</Product>
-    <Copyright>Copyright ©2024</Copyright>
+    <Copyright>Copyright ©2025</Copyright>
     <AssemblyFileVersion>0.1.%2a</AssemblyFileVersion>
-    <FileVersion>0.1.%2a</FileVersion>
+    <FileVersion>0.5.*</FileVersion>
     <Deterministic>false</Deterministic>
     <PackageProjectUrl>https://github.com/tuffff/tuffff-cards</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/tuffff/tuffff-cards/main/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/tuffff/tuffff-cards</RepositoryUrl>
+    <Version>0.5.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Markdig" Version="0.39.1" />
