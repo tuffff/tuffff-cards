@@ -11,8 +11,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="Add smoke test, fix example, use Sep for parsing csv.">
-      <change beforePath="$PROJECT_DIR$/tuffCards/Commands/Converter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Commands/Converter.cs" afterDir="false" />
+    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/test/ExampleTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/IOHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/TemporaryDirectory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/ProcessHelper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/SmokeTest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +27,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="DpaMonitoringSettings">
-    <option name="autoShow" value="false" />
+    <option name="firstShow" value="false" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -48,12 +55,18 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.DependencyInjection/src/ServiceProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Abstractions/src/LogEntry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Abstractions/src/LoggerExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Console/src/ConsoleFormatter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/Microsoft.Extensions.Logging.Console/src/SimpleConsoleFormatterOptions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/IO/TextWriter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/243a037ca7a04510a506adfdd94befbac90930/64/78026762/String.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3f321d6671ef5bdde79d24ff1255eae2ab21d8b4cb6f4611fd0a7246730d24b/SepReaderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/541bfd18a7ca708680ac6d346d392411c2311d8cf9629dd4851c39659bc85/IPage.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/794c1fb2357a466a1f872816fdae7380eebb48193918e1647211f271609b64/SepReader.cs" root0="FORCE_HIGHLIGHTING" />
@@ -62,9 +75,10 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88226a353f9286b5ab68d4171865832bcdcae9aa28e9781c8951ab94f765/IBrowser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e393d6469890b2e6e96dd7d52a8bdc6a3b8de784d181e6d3dbdcc97e6f4a4/TrueException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Commands/Converter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Commands/Converter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Presets/Presets.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -95,6 +109,7 @@
     "Publish to folder.Publish tuffCards to folder.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "cf6fb342-292a-486c-a873-c9aae20bbb29.executor": "Debug",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
@@ -165,7 +180,8 @@
       <workItem from="1720284105156" duration="2765000" />
       <workItem from="1720543945411" duration="2577000" />
       <workItem from="1721726134718" duration="3000" />
-      <workItem from="1736364431334" duration="9047000" />
+      <workItem from="1736364431334" duration="13008000" />
+      <workItem from="1736429349949" duration="2868000" />
     </task>
     <task id="LOCAL-00001" summary="Initial">
       <option name="closed" value="true" />
@@ -415,7 +431,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736388942728</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Forgot to remove a !">
+      <option name="closed" value="true" />
+      <created>1736388984853</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1736388984853</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -448,7 +472,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Add Scripts, Global css and Screenshots" />
     <MESSAGE value="Improve project creation" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Add icon" />
@@ -473,6 +496,7 @@
     <MESSAGE value="Ignore lines starting with //" />
     <MESSAGE value="Fix examples" />
     <MESSAGE value="Add smoke test, fix example, use Sep for parsing csv." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add smoke test, fix example, use Sep for parsing csv." />
+    <MESSAGE value="Forgot to remove a !" />
+    <option name="LAST_COMMIT_MESSAGE" value="Forgot to remove a !" />
   </component>
 </project>

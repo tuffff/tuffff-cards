@@ -144,7 +144,6 @@ public class ImageRenderer : HtmlObjectRenderer<Image> {
 				var svg = File.ReadAllText(file.FullName).AsSpan();
 				renderer.Write(svg[..5]);
 				renderer.Write($"class=\"{cssClass}\" ");
-				renderer.Write(" ");
 				renderer.Write(svg[5..]);
 			}
 			else {
