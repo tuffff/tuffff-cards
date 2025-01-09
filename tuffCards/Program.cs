@@ -26,9 +26,9 @@ public class Program {
 			batchSizeArg,
 			singleArg,
 			generateImageArg,
-			logLevelArg,
 			watchFilesArg,
-			createBacksArg
+			createBacksArg,
+			logLevelArg
 		};
 		root.AddCommand(convertCmd);
 		convertCmd.SetHandler(async (target, type, batchSize, single, image, watch, createBacks, logLevel) =>
