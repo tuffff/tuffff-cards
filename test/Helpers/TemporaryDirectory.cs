@@ -1,9 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace test;
+namespace test.Helpers;
 
-public class TemporaryDirectory : IDisposable {
-	public string FolderPath { get; }
+public sealed class TemporaryDirectory : IDisposable {
+	private readonly string FolderPath;
 	private readonly string OldCurrentDirectory;
 
 	public TemporaryDirectory([CallerFilePath] string classPath = "", [CallerMemberName] string methodName = "") {
@@ -20,6 +20,6 @@ public class TemporaryDirectory : IDisposable {
 
 	public void Dispose() {
 		Directory.SetCurrentDirectory(OldCurrentDirectory);
-		Directory.Delete(FolderPath, true);
+		// Directory.Delete(FolderPath, true);
 	}
 }

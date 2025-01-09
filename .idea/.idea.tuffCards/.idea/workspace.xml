@@ -11,11 +11,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="Add sprite target to empty project">
+    <list default="true" id="54c5132a-3fe1-4de1-862d-3beebe3baa30" name="Changes" comment="Adjust convert command parameter order">
+      <change afterPath="$PROJECT_DIR$/test/Helpers/ConsoleCapture.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.tuffCards/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/test/test.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tuffCards/tuffCards.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards/tuffCards.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/ExampleTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/test/ExampleTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/IOHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/test/Helpers/IOHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/TemporaryDirectory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/test/Helpers/TemporaryDirectory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/tuffCards.sln.DotSettings.user" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +68,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/243a037ca7a04510a506adfdd94befbac90930/64/78026762/String.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3c1af32124f0c12160568466f63255433879dc49a8fc6768cc297144fa53f4/Handler.Func.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3f321d6671ef5bdde79d24ff1255eae2ab21d8b4cb6f4611fd0a7246730d24b/SepReaderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4475e657b44d672a25e752f42779a85bd60e55eeefec0844abbfd6dac9feb1/StringWriter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/541bfd18a7ca708680ac6d346d392411c2311d8cf9629dd4851c39659bc85/IPage.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/794c1fb2357a466a1f872816fdae7380eebb48193918e1647211f271609b64/SepReader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/999ae9cc4ab7b7cfbc5080803e994426e97fd9d87c5b1f44544a799bc114/StringAsserts.cs" root0="FORCE_HIGHLIGHTING" />
@@ -78,6 +81,7 @@
     <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Markdown/TuffCardsMarkdownParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Markdown/TuffCardsMarkdownParser.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/tuffCards/Presets/Presets.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/sp/Documents/TuffCards/tuffCards/tuffCards/Program.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -180,7 +184,7 @@
       <workItem from="1720543945411" duration="2577000" />
       <workItem from="1721726134718" duration="3000" />
       <workItem from="1736364431334" duration="13008000" />
-      <workItem from="1736429349949" duration="5663000" />
+      <workItem from="1736429349949" duration="6814000" />
     </task>
     <task id="LOCAL-00001" summary="Initial">
       <option name="closed" value="true" />
@@ -462,7 +466,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736433706514</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Update packages">
+      <option name="closed" value="true" />
+      <created>1736435094960</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1736435094960</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Adjust convert command parameter order">
+      <option name="closed" value="true" />
+      <created>1736435135962</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1736435135962</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -495,8 +515,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Change Icon/Images to {/{{" />
-    <MESSAGE value="Remove debug output" />
     <MESSAGE value="Add custom Markdown function (&quot;md&quot;) to scriban objects" />
     <MESSAGE value="Add publish file" />
     <MESSAGE value="Add csv config" />
@@ -520,7 +538,9 @@
     <MESSAGE value="Improve test coverage&#10;&#10;Remove extra space for svgas" />
     <MESSAGE value="Split Markdown parser" />
     <MESSAGE value="Add sprite target to empty project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add sprite target to empty project" />
+    <MESSAGE value="Update packages" />
+    <MESSAGE value="Adjust convert command parameter order" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adjust convert command parameter order" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

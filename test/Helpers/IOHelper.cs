@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace test;
+namespace test.Helpers;
 
 public static class IoHelper {
 	public static string GetFileHash(this string path) {
