@@ -300,6 +300,7 @@ public class Converter {
 	private async Task CreateBacks(bool generateImage, TuffCardsMarkdownParser parser, Template cardTemplate, WrapperModel model, Template targetTemplate, string outputDirectory, string name) {
 		var backContent = new ScriptObject();
 		backContent.Import("md", new Func<string, string>(parser.Parse));
+		backContent["Deck"] = name;
 		var backCardResult = await cardTemplate.RenderAsync(backContent);
 		model.cards = new List<string> { backCardResult };
 		var backOutputResult = await PrepareTargetModel(model, parser, targetTemplate);
