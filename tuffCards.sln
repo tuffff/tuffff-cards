@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tuffCards", "tuffCards\tuffCards.csproj", "{5278CC35-D6BD-4E84-BCE9-EFAF89F3FB4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tuffCards.Tests", "tuffCards.Tests\tuffCards.Tests.csproj", "{AAE8E9B3-A0A0-44EB-B3FA-5F98A1C68C53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

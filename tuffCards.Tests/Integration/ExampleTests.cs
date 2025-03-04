@@ -1,40 +1,36 @@
-using test.Helpers;
-using TuffCards;
-using Xunit.Abstractions;
+using tuffCards.Tests.Helpers;
 
-namespace test;
+namespace tuffCards.Tests.Integration;
 
-public class ExampleTests {
-	private readonly ITestOutputHelper TestOutputHelper;
-
-	public ExampleTests(ITestOutputHelper testOutputHelper) {
-		TestOutputHelper = testOutputHelper;
-	}
+[Collection(Collections.UsesCwd)]
+public class ExampleTests(ITestOutputHelper testOutputHelper, TemporaryDirectoryFactory temporaryDirectoryFactory) {
 
 	[Fact]
+	[UsedImplicitly]
 	public async Task ValidateExampleDefaultOutput() {
-		using var tempDir = new TemporaryDirectory();
-		using var _ = new ConsoleCapture(TestOutputHelper);
+		using var tempDir = temporaryDirectoryFactory.Create();
+		using var _ = new ConsoleCapture(testOutputHelper);
 
 		await Program.Main(["create-example"]);
 		await Program.Main(["convert"]);
 
 		foreach (var (file, expectedHash) in new[] {
-				("actions", "B189DEC38A1FCBA5DDD50B96478724E01CDE1F676F2C4B35B78C243090FAE877"),
-				("buildings", "12E7ED8866B4E04FBE8D949725A34A2225ED25A5B967BBE71E2A5BDE4C907418")
+				("actions", "F30540C75D9D9D506AEE72BC975B407086D6D755E23CD92D2B26B7FD5A92C076"),
+				("buildings", "84F0C36B249B29BB818A12C1072AFF167A9907795EA33B0172F8806E0E6D1731")
 			}) {
 			var path = tempDir.GetPath($@"output\default\{file}.html");
 			Assert.True(File.Exists(path), $"The file '{path}' was not created.");
 			var actualHash = path.GetFileHash();
-			TestOutputHelper.WriteLine($"File {file} has hash {actualHash}");
+			testOutputHelper.WriteLine($"File {file} has hash {actualHash}");
 			Assert.Equal(expectedHash, actualHash);
 		}
 	}
 
 	[Fact]
+	[UsedImplicitly]
 	public async Task ValidateExampleSpriteImageOutput() {
-		using var tempDir = new TemporaryDirectory();
-		using var _ = new ConsoleCapture(TestOutputHelper);
+		using var tempDir = temporaryDirectoryFactory.Create();
+		using var _ = new ConsoleCapture(testOutputHelper);
 
 		await Program.Main(["create-example"]);
 		await Program.Main(["convert", "--target", "sprite", "--image"]);
@@ -46,7 +42,7 @@ public class ExampleTests {
 			var path = tempDir.GetPath($@"output\sprite\{file}.png");
 			Assert.True(File.Exists(path), $"The file '{path}' was not created.");
 			var actualHash = path.GetFileHash();
-			TestOutputHelper.WriteLine($"File {file} has hash {actualHash}");
+			testOutputHelper.WriteLine($"File {file} has hash {actualHash}");
 			Assert.Equal(expectedHash, actualHash);
 		}
 	}

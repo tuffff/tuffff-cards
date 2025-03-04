@@ -4,14 +4,14 @@ namespace tuffCards.Markdown;
 
 public class MarkdownParserFactory {
 	private readonly FolderRepository FolderRepository;
-	private readonly ILogger<TuffCardsMarkdownParser> Logger;
+	private readonly ILogger<MarkdownPipeline> Logger;
 
-	public MarkdownParserFactory(FolderRepository folderRepository, ILogger<TuffCardsMarkdownParser> logger) {
+	public MarkdownParserFactory(FolderRepository folderRepository, ILogger<MarkdownPipeline> logger) {
 		FolderRepository = folderRepository;
 		Logger = logger;
 	}
 
-	public TuffCardsMarkdownParser Build(string targetName) {
-		return new TuffCardsMarkdownParser(FolderRepository, targetName, Logger);
+	public CustomMarkdownParser Build(string targetName) {
+		return new CustomMarkdownParser(FolderRepository, targetName, Logger);
 	}
 }

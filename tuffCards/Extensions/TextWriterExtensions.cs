@@ -1,4 +1,4 @@
-namespace TuffCards.Extensions;
+namespace tuffCards.Extensions;
 
 public static class TextWriterExtensions
 {

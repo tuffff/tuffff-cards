@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace TuffCards.Extensions;
+namespace tuffCards.Extensions;
 
 [SuppressMessage("Usage", "CA2254:Template should be a static expression")]
 public static class LoggerExtensions {

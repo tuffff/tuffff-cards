@@ -1,0 +1,46 @@
+﻿<div class="wrapper default {{ name }}">{{ for card in cards }}
+	{{ card }}{{ end }}
+</div>
+
+<script>{{ for script in scripts }}
+{{ script }}{{ end }}
+
+fetch(window.location)
+    .then((response) => {
+        return response.text();
+    })
+    .then(original => {
+        var bfr = original;
+        setInterval(function () {
+            fetch(window.location)
+                .then((response) => {
+                    return response.text();
+                }).then(r => {
+                if (bfr !== r) {
+                    window.location.reload();
+                } else {
+                    bfr = r;
+                }
+            });
+        }, 200);
+    })
+    .catch(() => {
+        console.error('Cannot reload local file. Use Firefox or pass "--allow-file-access-from-files" to chrome.')
+    });
+</script>
+
+<style>
+	body {
+		margin: 0;
+	}
+	.default {
+		padding: 8px;
+		gap: 8px;
+		> div {
+			border-radius: 8px;
+			border: solid thin black;
+		}
+	}
+	{{ globaltargetcss }}
+	{{ cardtypecss }}
+</style>

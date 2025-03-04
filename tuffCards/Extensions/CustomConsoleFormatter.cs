@@ -1,16 +1,13 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 
-namespace TuffCards.Extensions;
+namespace tuffCards.Extensions;
 
-public class TuffCardsConsoleFormatter : ConsoleFormatter
-{
-	public TuffCardsConsoleFormatter() : base(nameof(TuffCardsConsoleFormatter)) { }
-
+public class CustomConsoleFormatter() : ConsoleFormatter(nameof(CustomConsoleFormatter)) {
 	public override void Write<TState>(in LogEntry<TState> logEntry, IExternalScopeProvider? scopeProvider, TextWriter textWriter)
 	{
 		var message = logEntry.Formatter(logEntry.State, logEntry.Exception);
-		message = message.Replace("<success>", "\x1B[1m\x1B[32m").Replace("</success>", "\x1B[39m\x1B[22m");
+		message = message.Replace("<success>", "\e[1m\e[32m").Replace("</success>", "\e[39m\e[22m");
 
 		var logLevelColors = GetLogLevelConsoleColors(logEntry.LogLevel);
 
@@ -82,4 +79,4 @@ public class TuffCardsConsoleFormatter : ConsoleFormatter
 	}
 }
 
-public class TuffCardsConsoleFormatterOptions : ConsoleFormatterOptions {}
+public class CustomConsoleFormatterOptions : ConsoleFormatterOptions {}

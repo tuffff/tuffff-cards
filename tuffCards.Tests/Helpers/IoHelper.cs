@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace test.Helpers;
+namespace tuffCards.Tests.Helpers;
 
 public static class IoHelper {
 	public static string GetFileHash(this string path) {

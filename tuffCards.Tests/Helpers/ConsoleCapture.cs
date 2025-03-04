@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace test.Helpers;
+﻿namespace tuffCards.Tests.Helpers;
 
 public sealed class ConsoleCapture : IDisposable {
 	private readonly ITestOutputHelper TestOutputHelper;

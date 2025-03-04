@@ -2,11 +2,11 @@ using tuffCards.Repositories;
 
 namespace tuffCards.Markdown;
 
-public class TuffCardsMarkdownParser {
-	private readonly ILogger<TuffCardsMarkdownParser> Logger;
+public class CustomMarkdownParser {
+	private readonly ILogger<MarkdownPipeline> Logger;
 	private readonly MarkdownPipeline Pipeline;
 
-	public TuffCardsMarkdownParser(FolderRepository folderRepository, string targetName, ILogger<TuffCardsMarkdownParser> logger) {
+	public CustomMarkdownParser(FolderRepository folderRepository, string targetName, ILogger<MarkdownPipeline> logger) {
 		Logger = logger;
 		Pipeline = new MarkdownPipelineBuilder()
 			.UseImages(new ImageOptions {

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <OutputType>Exe</OutputType>
-    <LangVersion>11</LangVersion>
+    <LangVersion>13</LangVersion>
     <Nullable>enable</Nullable>
     <ApplicationIcon>..\res\icon.ico</ApplicationIcon>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -39,5 +39,33 @@
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
     <PackageReference Include="tuffLib" Version="1.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Presets\StrongImage.svg" />
+    <EmbeddedResource Include="Presets\Strong.svg" />
+    <None Remove="Presets\ExampleActions.csv" />
+    <EmbeddedResource Include="Presets\ExampleActions.csv" />
+    <None Remove="Presets\SpriteTarget.html" />
+    <EmbeddedResource Include="Presets\SpriteTarget.html" />
+    <None Remove="Presets\ExampleActions.html" />
+    <EmbeddedResource Include="Presets\ExampleActions.html" />
+    <None Remove="Presets\Overview.html" />
+    <EmbeddedResource Include="Presets\Overview.html" />
+    <None Remove="Presets\ExampleActions.css" />
+    <EmbeddedResource Include="Presets\ExampleActions.css" />
+    <None Remove="Presets\Tap.svg" />
+    <EmbeddedResource Include="Presets\Tap.svg" />
+    <None Remove="Presets\ExampleBuildings.html" />
+    <EmbeddedResource Include="Presets\ExampleBuildings.html" />
+    <None Remove="Presets\ExampleBuildings.csv" />
+    <EmbeddedResource Include="Presets\ExampleBuildings.csv" />
+    <None Remove="Presets\FitText.js" />
+    <EmbeddedResource Include="Presets\FitText.js" />
+    <None Remove="Presets\GlobalTarget.css" />
+    <EmbeddedResource Include="Presets\GlobalTarget.css" />
+    <None Remove="Presets\ExampleBuildings.css" />
+    <EmbeddedResource Include="Presets\ExampleBuildings.css" />
+    <None Remove="Presets\DefaultTarget.html" />
+    <EmbeddedResource Include="Presets\DefaultTarget.html" />
   </ItemGroup>
 </Project>

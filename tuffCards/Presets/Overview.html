@@ -1,0 +1,67 @@
+﻿<div class="wrapper">
+	<div id="toc">
+		{{ for deck in decks }}
+		<label>
+			<input type="radio" name="deck" onclick="load('{{ target }}/{{ deck }}')">
+			{{ deck }}
+		</label>
+		{{ end }}
+	</div>
+	<iframe id="main" src=""></iframe>
+</div>
+
+<script>
+    function load(name) {
+        let main = document.getElementById("main");
+        main.src = name + ".html";
+    }
+</script>
+
+<style>
+	body {
+		margin: 0;
+	}
+	.wrapper {
+		display: flex;
+		gap: 1em;
+
+		> #toc {
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: column;
+			padding: 0.5em;
+			> label {
+				padding: 0.1em;
+				border-radius: 0.2em;
+				color: #333;
+				position: relative;
+				cursor: pointer;
+				&:hover {
+					background: #eee;
+				}
+				> input {
+					appearance: none;
+					position: absolute;
+					top: -0.22em;
+					left: -0.38em;
+					width: 100%;
+					height: 100%;
+					z-index: -1;
+					&:checked {
+						background: rgba(0, 0, 255, 0.1);
+					}
+				}
+			}
+		}
+
+		> #main {
+			flex: 1 0 0;
+			min-width: 0;
+			height: 100vh;
+			border: none;
+			&[src=""] {
+				background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100% 100%"><text fill="%23333" x="50%" y="50%" font-family="sans-serif" font-size="16px" text-anchor="middle">Select a deck</text></svg>') 0 0 no-repeat;
+			}
+		}
+	}
+</style>

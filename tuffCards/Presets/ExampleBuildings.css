@@ -1,0 +1,64 @@
+﻿.buildings > div {
+	height: 300px;
+	width: 200px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	color: white;
+	position: relative;
+	background: linear-gradient(45deg, #dca 12%, transparent 0, transparent 88%, #dca 0),
+	linear-gradient(135deg, transparent 37%, #a85 0, #a85 63%, transparent 0),
+	linear-gradient(45deg, transparent 37%, #dca 0, #dca 63%, transparent 0) #753;
+	background-size: 12px 12px;
+	justify-content: stretch;
+	> .name {
+		padding: 2px 6px;
+		flex: 0 0 auto;
+		align-self: stretch;
+		background: rgba(0, 0, 0, 0.3);
+		font-weight: bold;
+		font-size: large;
+		backdrop-filter: blur(3px);
+		text-align: center;
+		height: 25px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		> span {
+			white-space: nowrap;
+		}
+	}
+	> .effect {
+		display: flex;
+		flex: 1 1 0;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		margin: 8px;
+		> div {
+			height: 100%;
+			width: 90%;
+			padding: 4px;
+			background: #edb;
+			border: 3px solid #974;
+			border-radius: 0;
+			color: black;
+		}
+	}
+	.title-image {
+		display: inline-block;
+		width: 184px;
+		margin: 8px;
+		flex: 1 1 0;
+		min-height: 0;
+		text-align: center;
+		position: relative;
+	}
+}
+
+.buildings.default > div {
+	> .name {
+		border-radius: 7px 7px 0 0;
+	}
+
+}
