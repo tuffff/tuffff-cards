@@ -5,26 +5,26 @@ using tuffLib.Functional;
 
 namespace tuffCards.Tests;
 
-public class MetaTests(IServiceProvider provider, ITestOutputHelper testOutputHelper) {
+public class MetaTests(IServiceProvider Provider, ITestOutputHelper TestOutputHelper) {
 
 	[Fact]
 	public void ShouldResolveLoggerFactory() {
-		var loggerFactory = provider.GetService<ILoggerFactory>();
+		var loggerFactory = Provider.GetService<ILoggerFactory>();
 		Assert.NotNull(loggerFactory);
 	}
 
 	[Fact]
 	public void ShouldResolveTemporaryDirectoryFactory() {
-		var temporaryDirectoryFactory = provider.GetService<TemporaryDirectoryFactory>();
+		var temporaryDirectoryFactory = Provider.GetService<TemporaryDirectoryFactory>();
 		Assert.NotNull(temporaryDirectoryFactory);
 	}
 
 	[Fact]
 	public void ShouldResolveAllServices() {
-		var allServices = provider.GetServices<object>();
+		var allServices = Provider.GetServices<object>();
 
 		foreach (var service in allServices) {
-			service.GetType().FullName?.Apply(testOutputHelper.WriteLine);
+			service.GetType().FullName?.Apply(TestOutputHelper.WriteLine);
 		}
 	}
 }

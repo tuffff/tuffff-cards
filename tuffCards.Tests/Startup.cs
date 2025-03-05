@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using tuffCards.Commands;
 using tuffCards.Markdown;
-using tuffCards.Repositories;
+using tuffCards.Services;
 using tuffCards.Tests.Helpers;
 using Xunit.DependencyInjection.Logging;
 

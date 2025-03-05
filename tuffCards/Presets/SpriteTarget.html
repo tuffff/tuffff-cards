@@ -1,16 +1,16 @@
-﻿<div class="wrapper tts {{ name }}">{{ for card in cards }}
+﻿<div class="wrapper sprite {{ name }}">{{ for card in cards }}
 	{{ card }}{{ end }}
 </div>
 
 <script>{{ for script in scripts }}
-{{ script }}{{ end }}
+	{{ script }}{{ end }}
 </script>
 
 <style>
 	html, body {
 		margin: 0;
 	}
-	.wrapper.tts {
+	.wrapper.sprite {
 		display: grid;
 		grid-template-columns: repeat(10, min-content);
 		grid-auto-flow: row;

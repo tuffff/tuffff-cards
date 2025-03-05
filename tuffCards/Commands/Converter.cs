@@ -2,28 +2,25 @@ using nietras.SeparatedValues;
 using PuppeteerSharp;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using tuffCards.Presets;
-using tuffCards.Repositories;
+using tuffCards.Services;
 using tuffLib.Dictionaries;
 
 namespace tuffCards.Commands;
 
-public class Converter {
-	private readonly FolderRepository FolderRepository;
-	private readonly MarkdownParserFactory MarkdownParserFactory;
-	private readonly ILogger<Converter> Logger;
+public partial class Converter(
+	FolderRepository FolderRepository,
+	MarkdownParserFactory MarkdownParserFactory,
+	ILogger<Converter> Logger,
+	BrowserService BrowserService) {
 
-	public Converter(FolderRepository folderRepository, MarkdownParserFactory markdownParserFactory, ILogger<Converter> logger) {
-		FolderRepository = folderRepository;
-		MarkdownParserFactory = markdownParserFactory;
-		Logger = logger;
-	}
-
-	public async Task Convert(string target, string? type, int? batchSize, bool generateImage, bool watchFiles, bool createBacks, bool overview) {
+	public async Task Convert(string target, string? type, int? batchSize, string? bleed, bool generateImage, bool watchFiles, bool createBacks, bool overview) {
 		try {
 			if (batchSize is < 1) {
 				throw new Exception("Batch size cannot be < 1");
 			}
+			var bleedPixels = GetBleedPixels(bleed);
 			var targetTemplate = GetTargetTemplate(target);
 			var outputDirectory = FolderRepository.GetOutputDirectory(target);
 			FolderRepository.ClearOutputDirectory(target);
@@ -69,7 +66,7 @@ public class Converter {
 					scripts = scripts
 				};
 
-				decksNames.AddRange(await RenderDecks(decks, model, batchSize, generateImage, createBacks, parser, targetTemplate, outputDirectory, cardTemplate));
+				decksNames.AddRange(await RenderDecks(decks, model, batchSize, generateImage, bleedPixels, createBacks, parser, targetTemplate, outputDirectory, cardTemplate));
 			}
 
 			if (overview)
@@ -78,11 +75,34 @@ public class Converter {
 			Logger.LogSuccess("Finished.");
 
 			if (watchFiles)
-				WatchFiles(target, type, batchSize, generateImage, createBacks, overview);
+				WatchFiles(target, type, batchSize, generateImage, bleedPixels, createBacks, overview);
 		}
 		catch (Exception ex) {
 			Logger.LogError("While converting: {Message}", ex.Message);
 		}
+	}
+
+	private int GetBleedPixels(string? bleed) {
+		if (bleed == null)
+			return 0;
+		var match = BleedRegex().Match(bleed);
+		if (!match.Success)
+			throw new Exception("Invalid bleed value");
+		var bleedValue = int.Parse(match.Groups[1].Value);
+		if (bleedValue < 0)
+			throw new Exception("Bleed value cannot be < 0");
+		var bleedUnit = match.Groups[2].Value;
+		var bleedPixels = System.Convert.ToInt32(bleedUnit switch {
+			"px" => bleedValue,
+			"mm" => bleedValue * 3.7795275591,
+			"cm" => bleedValue * 37.795275591,
+			"in" => bleedValue * 90,
+			"pt" => bleedValue * 1.3333333333,
+			"pc" => bleedValue * 16,
+			_ => throw new Exception($"Unknown bleed unit: {bleedUnit}")
+		});
+		Logger.LogDebug("Bleed value: {bleedValue}", bleedValue);
+		return bleedPixels;
 	}
 
 	private async Task RenderOverview(IEnumerable<string> renderedDecks, string target) {
@@ -97,7 +117,7 @@ public class Converter {
 		Logger.LogInformation("Created overview for {count} decks", renderedDecks.Count());
 	}
 
-	private async Task<IEnumerable<string>> RenderDecks(List<(string deckName, List<(string title, string content)> cards)> decks, WrapperModel model, int? batchSize, bool generateImage, bool createBacks, CustomMarkdownParser parser, Template targetTemplate, string outputDirectory, Template cardTemplate) {
+	private async Task<IEnumerable<string>> RenderDecks(List<(string deckName, List<(string title, string content)> cards)> decks, WrapperModel model, int? batchSize, bool generateImage, int bleedPixels, bool createBacks, CustomMarkdownParser parser, Template targetTemplate, string outputDirectory, Template cardTemplate) {
 		try {
 			var result = await Task.WhenAll(decks.Select(async deck => {
 				var batchType = batchSize switch {
@@ -115,13 +135,13 @@ public class Converter {
 							BatchType.Single => $"{deck.deckName} {FolderRepository.MakeValidFileName(batch.First().title)}",
 							_ => $"{deck.deckName} {batchIndex}"
 						};
-						var outputPath = await CreateTarget(generateImage, outputDirectory, batchName, outputResult);
+						var outputPath = await CreateTarget(generateImage, bleedPixels, outputDirectory, batchName, outputResult);
 						if (batchType != BatchType.All)
 							Logger.LogDebug("Created {count} card(s): {outputPath}", batch.Length, outputPath);
 						return batchName;
 					}));
 				if (createBacks) {
-					await CreateBacks(generateImage, parser, cardTemplate, model, targetTemplate, outputDirectory, deck.deckName);
+					await CreateBacks(generateImage, bleedPixels, parser, cardTemplate, model, targetTemplate, outputDirectory, deck.deckName);
 				}
 				return batches;
 			}));
@@ -133,7 +153,7 @@ public class Converter {
 		}
 		catch (Exception ex) {
 			Logger.LogError("Writing output: {message}. Skipping.", ex.Message);
-			return Enumerable.Empty<string>();
+			return [];
 		}
 	}
 
@@ -168,8 +188,7 @@ public class Converter {
 	private async Task<List<(string deckName, List<(string title, string content)> cards)>>
 		RenderCards(Template template, string templateName, string cardData, CustomMarkdownParser parser) {
 		var usedNames = new Dictionary<string, int>();
-		var decks = new DefaultValueDictionary<string, List<(string title, string content)>>(
-			() => new List<(string title, string content)>());
+		var decks = new DefaultValueDictionary<string, List<(string title, string content)>>(() => []);
 		using var reader = Sep.Reader(o => o with { Unescape = true}).FromFile(cardData);
 		try {
 			foreach (var (data, title) in reader.Enumerate(row => {
@@ -201,11 +220,11 @@ public class Converter {
 		return decks.Select(kv => (kv.Key, kv.Value)).ToList();
 	}
 
-	private async Task<string> CreateTarget(bool generateImage, string outputDirectory, string deckName, string outputResult) {
+	private async Task<string> CreateTarget(bool generateImage, int bleedPixels, string outputDirectory, string deckName, string outputResult) {
 		var outputPath = Path.Combine(outputDirectory, $"{deckName}.html");
 		await WriteTarget(outputPath, outputResult);
 		if (generateImage)
-			await GenerateImage(outputPath, outputDirectory, deckName);
+			await GenerateImage(outputPath, outputDirectory, deckName, bleedPixels);
 		return outputPath;
 	}
 
@@ -265,26 +284,19 @@ public class Converter {
 		return string.Empty;
 	}
 
-	private async Task GenerateImage(string outputPath, string outputDirectory, string name) {
+	private async Task GenerateImage(string outputPath, string outputDirectory, string name, int bleedPixels) {
 		Logger.LogDebug("Generating image ... ");
 		try {
 			var imagePath = Path.Combine(outputDirectory, $"{name}.png");
-			var browserFetcher = new BrowserFetcher(SupportedBrowser.Chrome);
-			if (browserFetcher.GetInstalledBrowsers().All(c => c.Browser != SupportedBrowser.Chrome)) {
-				Logger.LogInformation("Getting browser, this make take some time ...");
-				await browserFetcher.DownloadAsync();
-			}
-			Logger.LogDebug("Launching ...");
-			await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions {
-				Headless = true,
-				Browser = SupportedBrowser.Chrome,
-				DefaultViewport = new ViewPortOptions { Width = 1, Height = 1 }
-			});
-			Logger.LogDebug("Navigating ...");
-			await using var page = await browser.NewPageAsync();
+			await using var page = await BrowserService.GetPage();
 			await page.GoToAsync(outputPath);
 			Logger.LogDebug("Screenshotting ...");
 			await page.ScreenshotAsync(imagePath, new ScreenshotOptions { FullPage = true });
+			Logger.LogDebug("... done");
+			if (bleedPixels > 0) {
+				Logger.LogDebug("Adding bleed ...");
+				BleedService.AddBleed(imagePath, bleedPixels);
+			}
 			Logger.LogInformation("Added image: {imagePath}", imagePath);
 		}
 		catch (Exception ex) {
@@ -292,7 +304,7 @@ public class Converter {
 		}
 	}
 
-	private void WatchFiles(string target, string? type, int? batchSize, bool image, bool createBacks, bool overview) {
+	private void WatchFiles(string target, string? type, int? batchSize, bool image, int bleedPixels, bool createBacks, bool overview) {
 		var cardsWatcher = type != null
 			? new FileSystemWatcher { Filters = { $"{target}.csv", $"{target}.html", $"{target}.css" } }
 			: new FileSystemWatcher { Filters = { "*.csv", "*.html", "*.css" } };
@@ -318,21 +330,21 @@ public class Converter {
 		var observable = cardsEvents.Merge(targetEvents);
 		observable.Throttle(TimeSpan.FromMilliseconds(200)).Subscribe(arg => {
 			Logger.LogDebug("File changed: {path}", arg.FullPath);
-			Convert(target, type, batchSize, image, false, createBacks, overview).Wait();
+			Convert(target, type, batchSize, bleedPixels == 0 ? null : $"{bleedPixels}px", image, false, createBacks, overview).Wait();
 		Logger.LogSuccess("Still watching. Press q to quit.");
 		});
 		Logger.LogSuccess("Watching files. Press q to quit.");
 		while (Console.ReadKey().KeyChar != 'q') {}
 	}
 
-	private async Task CreateBacks(bool generateImage, CustomMarkdownParser parser, Template cardTemplate, WrapperModel model, Template targetTemplate, string outputDirectory, string name) {
+	private async Task CreateBacks(bool generateImage, int bleedPixels, CustomMarkdownParser parser, Template cardTemplate, WrapperModel model, Template targetTemplate, string outputDirectory, string name) {
 		var backContent = new ScriptObject();
 		backContent.Import("md", new Func<string, string>(parser.Parse));
 		backContent["Deck"] = name;
 		var backCardResult = await cardTemplate.RenderAsync(backContent);
 		model.cards = new List<string> { backCardResult };
 		var backOutputResult = await RenderWithModel(model, parser, targetTemplate);
-		await CreateTarget(generateImage, outputDirectory, $"{name} back", backOutputResult);
+		await CreateTarget(generateImage, bleedPixels, outputDirectory, $"{name} back", backOutputResult);
 	}
 
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -351,4 +363,7 @@ public class Converter {
 		Single,
 		Batch
 	}
+
+    [GeneratedRegex(@"(\d+)\s*(\D+)")]
+    private static partial Regex BleedRegex();
 }

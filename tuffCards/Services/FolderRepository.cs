@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace tuffCards.Repositories;
+namespace tuffCards.Services;
 
 public class FolderRepository {
 	private readonly string TargetDirectory;

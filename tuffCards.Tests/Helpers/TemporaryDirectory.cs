@@ -25,12 +25,13 @@ public sealed class TemporaryDirectory : IDisposable {
 	public void Dispose() {
 		Directory.SetCurrentDirectory(OldCurrentDirectory);
 		Logger.LogInformation("Exited temporary directory, now in {}", FolderPath);
+		// TODO: include this
 		// Directory.Delete(FolderPath, true);
 	}
 }
 
-public sealed class TemporaryDirectoryFactory(ILoggerFactory loggerFactory) {
+public sealed class TemporaryDirectoryFactory(ILoggerFactory LoggerFactory) {
 	public TemporaryDirectory Create() {
-		return new TemporaryDirectory(loggerFactory.CreateLogger<TemporaryDirectory>());
+		return new TemporaryDirectory(LoggerFactory.CreateLogger<TemporaryDirectory>());
 	}
 }

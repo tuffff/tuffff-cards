@@ -1,12 +1,12 @@
 ﻿using tuffCards.Markdown;
-using tuffCards.Repositories;
+using tuffCards.Services;
 
 namespace tuffCards.Tests.Unit;
 
 [Collection(Collections.UsesCwd)]
-public class CustomMarkdownParserTests(MarkdownParserFactory parserFactory, FolderRepository folderRepository) {
+public class CustomMarkdownParserTests(MarkdownParserFactory ParserFactory, FolderRepository FolderRepository) {
 
-	private readonly CustomMarkdownParser Parser = parserFactory.Build("default");
+	private readonly CustomMarkdownParser Parser = ParserFactory.Build("default");
 
 	[Fact]
 	[UsedImplicitly]
@@ -21,13 +21,13 @@ public class CustomMarkdownParserTests(MarkdownParserFactory parserFactory, Fold
 	[InlineData(true)]
 	[UsedImplicitly]
 	public void RendersIcons(bool useImage) {
-		var directory = useImage ? folderRepository.GetImageDirectory() : folderRepository.GetIconsDirectory();
+		var directory = useImage ? FolderRepository.GetImageDirectory() : FolderRepository.GetIconsDirectory();
 		const string imageName = "test";
 		const string fileName = $"{imageName}.png";
 		Assert.True(Directory.Exists(directory));
 
 		var testFilePath = Path.Combine(directory, fileName);
-		var outputFilePath = Path.Combine(folderRepository.GetOutputDirectory("default"), $"{(useImage ? "image" : "icon")}-{fileName}");
+		var outputFilePath = Path.Combine(FolderRepository.GetOutputDirectory("default"), $"{(useImage ? "image" : "icon")}-{fileName}");
 		using (var _ = File.Create(testFilePath)) {}
 
 		var parsedResult = Parser.Parse(useImage ? $"{{{{{imageName}}}}}" : $"{{{imageName}}}");
