@@ -25,8 +25,7 @@ public sealed class TemporaryDirectory : IDisposable {
 	public void Dispose() {
 		Directory.SetCurrentDirectory(OldCurrentDirectory);
 		Logger.LogInformation("Exited temporary directory, now in {}", FolderPath);
-		// TODO: include this
-		// Directory.Delete(FolderPath, true);
+		Directory.Delete(FolderPath, true);
 	}
 }
 

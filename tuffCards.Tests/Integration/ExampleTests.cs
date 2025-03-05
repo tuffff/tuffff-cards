@@ -15,8 +15,8 @@ public class ExampleTests(ITestOutputHelper TestOutputHelper, TemporaryDirectory
 		await Program.Main(["convert"]);
 
 		foreach (var (file, expectedHash) in new[] {
-				("actions", "F30540C75D9D9D506AEE72BC975B407086D6D755E23CD92D2B26B7FD5A92C076"),
-				("buildings", "84F0C36B249B29BB818A12C1072AFF167A9907795EA33B0172F8806E0E6D1731")
+				("actions", "DB046EF506132317C91103CA2B7FAFEF9455ACD04216EDA77C3244910919A122"),
+				("buildings", "6371EFA8DBDE429FF11848AE939D42110BBFA65B6E19A0296631040163FA1692")
 			}) {
 			var path = tempDir.GetPath($@"output\default\{file}.html");
 			Assert.True(File.Exists(path), $"The file '{path}' was not created.");
@@ -36,8 +36,8 @@ public class ExampleTests(ITestOutputHelper TestOutputHelper, TemporaryDirectory
 		await Program.Main(["convert", "--target", "sprite", "--image"]);
 
 		foreach (var (file, expectedHash) in new[] {
-			("actions", "1FAB9B62FC6795337100DF17321B5F613E83078090EDD8703F2D817E77DDB658"),
-			("buildings", "3D465B67FA12F01EBD573806C095208C7E6B771FE5A9116192CF1DC9FD27416B")
+			("actions", "5387584E616D2DF64C4266BE0752D7DAD12E2EADEFF325615B66BD8B024DA740"),
+			("buildings", "5140D4F70770A285A6631363B124C5D34C368D6F3ACC3C817F0279C7F4A3366A")
 		}) {
 			var path = tempDir.GetPath($@"output\sprite\{file}.png");
 			Assert.True(File.Exists(path), $"The file '{path}' was not created.");
@@ -57,8 +57,8 @@ public class ExampleTests(ITestOutputHelper TestOutputHelper, TemporaryDirectory
 		await Program.Main(["convert", "--single", "--image", "--target", "sprite", "--bleed", "3mm"]);
 
 		foreach (var (file, expectedHash) in new[] {
-			("actions", "1FAB9B62FC6795337100DF17321B5F613E83078090EDD8703F2D817E77DDB658"),
-			("buildings", "3D465B67FA12F01EBD573806C095208C7E6B771FE5A9116192CF1DC9FD27416B")
+			("actions Do it hard", "CCFC6E216B5B450BFD43C27F14FD8DC90769A55BD5096BFFCDDD7CC089B30B0F"),
+			("buildings The great, awesome Castle of TuffVille", "ACD37990C3EC0B2FDE3A22170E0FAADA5144CE8854EC700239C19B98E5610B68")
 		}) {
 			var path = tempDir.GetPath($@"output\sprite\{file}.png");
 			Assert.True(File.Exists(path), $"The file '{path}' was not created.");

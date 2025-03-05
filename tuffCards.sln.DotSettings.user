@@ -23,4 +23,5 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=70386562_002D90c5_002D48c1_002Dbfc9_002De764b3e8b7d2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;tuffCards.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\Users\sp\Documents\TuffCards\TuffCards\tuffCards.Tests" Presentation="&amp;lt;tuffCards.Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/SpawnedProcessesKnownList/=chrome_002Eexe/@EntryIndexedValue">KillOrphaned</s:String>
 	</wpf:ResourceDictionary>

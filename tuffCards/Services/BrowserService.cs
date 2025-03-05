@@ -24,11 +24,14 @@ public sealed class BrowserService(ILogger<BrowserService> Logger) : IDisposable
 	}
 
 	public void Dispose() {
+		Browser?.CloseAsync().Wait();
 		Browser?.Dispose();
 	}
 
 	public async ValueTask DisposeAsync() {
-		if (Browser != null)
+		if (Browser != null) {
+			await Browser.CloseAsync();
 			await Browser.DisposeAsync();
+		}
 	}
 }

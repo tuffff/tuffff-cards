@@ -82,29 +82,6 @@ public partial class Converter(
 		}
 	}
 
-	private int GetBleedPixels(string? bleed) {
-		if (bleed == null)
-			return 0;
-		var match = BleedRegex().Match(bleed);
-		if (!match.Success)
-			throw new Exception("Invalid bleed value");
-		var bleedValue = int.Parse(match.Groups[1].Value);
-		if (bleedValue < 0)
-			throw new Exception("Bleed value cannot be < 0");
-		var bleedUnit = match.Groups[2].Value;
-		var bleedPixels = System.Convert.ToInt32(bleedUnit switch {
-			"px" => bleedValue,
-			"mm" => bleedValue * 3.7795275591,
-			"cm" => bleedValue * 37.795275591,
-			"in" => bleedValue * 90,
-			"pt" => bleedValue * 1.3333333333,
-			"pc" => bleedValue * 16,
-			_ => throw new Exception($"Unknown bleed unit: {bleedUnit}")
-		});
-		Logger.LogDebug("Bleed value: {bleedValue}", bleedValue);
-		return bleedPixels;
-	}
-
 	private async Task RenderOverview(IEnumerable<string> renderedDecks, string target) {
 		var outputPath = Path.Combine(FolderRepository.GetOutputRootDirectory(), $"{target}.html");
 		var template = Template.Parse(Defaults.Overview);
@@ -345,6 +322,29 @@ public partial class Converter(
 		model.cards = new List<string> { backCardResult };
 		var backOutputResult = await RenderWithModel(model, parser, targetTemplate);
 		await CreateTarget(generateImage, bleedPixels, outputDirectory, $"{name} back", backOutputResult);
+	}
+
+	private int GetBleedPixels(string? bleed) {
+		if (bleed == null)
+			return 0;
+		var match = BleedRegex().Match(bleed);
+		if (!match.Success)
+			throw new Exception("Invalid bleed value");
+		var bleedValue = int.Parse(match.Groups[1].Value);
+		if (bleedValue < 0)
+			throw new Exception("Bleed value cannot be < 0");
+		var bleedUnit = match.Groups[2].Value;
+		var bleedPixels = System.Convert.ToInt32(bleedUnit switch {
+			"px" => bleedValue,
+			"mm" => bleedValue * 3.7795275591,
+			"cm" => bleedValue * 37.795275591,
+			"in" => bleedValue * 90,
+			"pt" => bleedValue * 1.3333333333,
+			"pc" => bleedValue * 16,
+			_ => throw new Exception($"Unknown bleed unit: {bleedUnit}")
+		});
+		Logger.LogDebug("Bleed value: {bleedValue}", bleedValue);
+		return bleedPixels;
 	}
 
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
