@@ -2,15 +2,7 @@ using tuffCards.Services;
 
 namespace tuffCards.Commands;
 
-public class CardTypeAdder {
-	private readonly FolderRepository FolderRepository;
-	private readonly ILogger<CardTypeAdder> Logger;
-
-	public CardTypeAdder(FolderRepository folderRepository, ILogger<CardTypeAdder> logger) {
-		FolderRepository = folderRepository;
-		Logger = logger;
-	}
-
+public class CardTypeAdder(FolderRepository FolderRepository, ILogger<CardTypeAdder> Logger) {
 	public Task Add(string name, bool force) {
 		var cardsDirectory = FolderRepository.GetCardsDirectory();
 		var htmlPath = Path.Combine(cardsDirectory, $"{name}.html");

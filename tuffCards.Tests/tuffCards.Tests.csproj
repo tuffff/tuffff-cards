@@ -30,4 +30,17 @@
       <Compile Remove="ExampleTests.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Res\Test.ods" />
+      <None Update="OdsReader\Test.ods">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Unit\Test.ods">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Unit\Test.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

@@ -86,6 +86,8 @@ public static class Program {
 			.AddScoped<Converter>()
 			.AddScoped<Creator>()
 			.AddScoped<MarkdownParserFactory>()
+			.AddScoped<OdsReader>()
+			.AddSingleton<CsvReader>()
 			.AddSingleton<BrowserService>()
 			.AddScoped(_ => new FolderRepository(Directory.GetCurrentDirectory()))
 			.BuildServiceProvider();

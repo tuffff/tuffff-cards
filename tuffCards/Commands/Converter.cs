@@ -1,26 +1,27 @@
-using nietras.SeparatedValues;
 using PuppeteerSharp;
-using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
+using tuffCards.Commands.ConverterModels;
 using tuffCards.Presets;
 using tuffCards.Services;
 using tuffLib.Dictionaries;
 
 namespace tuffCards.Commands;
 
-public partial class Converter(
+public class Converter(
 	FolderRepository FolderRepository,
 	MarkdownParserFactory MarkdownParserFactory,
 	ILogger<Converter> Logger,
-	BrowserService BrowserService) {
+	BrowserService BrowserService,
+	CsvReader CsvReader,
+	OdsReader OdsReader) {
 
 	public async Task Convert(string target, string? type, int? batchSize, string? bleed, bool generateImage, bool watchFiles, bool createBacks, bool overview) {
 		try {
 			if (batchSize is < 1) {
 				throw new Exception("Batch size cannot be < 1");
 			}
-			var bleedPixels = GetBleedPixels(bleed);
+			var bleedPixels = bleed.ToPixels();
+			Logger.LogDebug("Bleed value: {bleedValue}", bleedPixels);
 			var targetTemplate = GetTargetTemplate(target);
 			var outputDirectory = FolderRepository.GetOutputDirectory(target);
 			FolderRepository.ClearOutputDirectory(target);
@@ -40,12 +41,13 @@ public partial class Converter(
 					continue;
 				}
 
-				var cardDataFilename = $"{templateName}.csv";
-				var cardDataPath = Path.Combine(templatePath.Directory!.FullName, cardDataFilename);
-				if (!File.Exists(cardDataPath)) {
+				var cardInfos = FindData(templatePath.Directory!.FullName, templateName);
+				if (cardInfos == null) {
 					Logger.LogWarning("Card data file {cardDataPath} missing, skipping.", templatePath);
 					continue;
 				}
+				var (cardData, cardDataPath) = cardInfos.Value;
+				Logger.LogDebug("Using card data: {path}", cardDataPath);
 
 				Template cardTemplate;
 				try {
@@ -56,14 +58,14 @@ public partial class Converter(
 					continue;
 				}
 
-				var decks = await RenderCards(cardTemplate, templateName, cardDataPath, parser);
+				var decks = await RenderCards(cardTemplate, templateName, cardData, parser);
 				var cardTypeCss = GetCardTypeCss(templatePath);
 
-				var model = new WrapperModel {
+				var model = new DeckModel(parser) {
 					name = templateName,
 					cardtypecss = cardTypeCss,
 					globaltargetcss = globalTargetCss,
-					scripts = scripts
+					scripts = scripts,
 				};
 
 				decksNames.AddRange(await RenderDecks(decks, model, batchSize, generateImage, bleedPixels, createBacks, parser, targetTemplate, outputDirectory, cardTemplate));
@@ -82,19 +84,46 @@ public partial class Converter(
 		}
 	}
 
-	private async Task RenderOverview(IEnumerable<string> renderedDecks, string target) {
+	private (List<(string name, Dictionary<string, string> data)> data, string path)? FindData(string templatePath, string templateName) {
+		var cardDataPath = Path.Combine(templatePath, $"{templateName}.csv");
+		if (File.Exists(cardDataPath)) {
+			var data = CsvReader.GetData(cardDataPath);
+			return (data, cardDataPath);
+		}
+		cardDataPath = Path.Combine(templatePath, $"{templateName}.ods");
+		if (File.Exists(cardDataPath)) {
+			var document = OdsReader.GetDocument(cardDataPath);
+			var data = document
+				.GetAllSheets()
+				.SelectMany(s => s.GetContentAsDictionary())
+				.ToList();
+			return (data, cardDataPath);
+		}
+		cardDataPath = Path.Combine(templatePath, "data.ods");
+		if (File.Exists(cardDataPath)) {
+			var document = OdsReader.GetDocument(cardDataPath);
+			var sheet = document.GetSheet(templateName);
+			if (sheet != null) {
+				var data = sheet.GetContentAsDictionary();
+				return (data, cardDataPath);
+			}
+		}
+		return null;
+	}
+
+	private async Task RenderOverview(List<string> renderedDecks, string target) {
 		var outputPath = Path.Combine(FolderRepository.GetOutputRootDirectory(), $"{target}.html");
 		var template = Template.Parse(Defaults.Overview);
-		var model = new ScriptObject {
-			["decks"] = renderedDecks,
-			["target"] = target
+		var model = new OverviewModel {
+			decks = renderedDecks,
+			target = target
 		};
 		var outputResult = await template.RenderAsync(model);
 		await WriteTarget(outputPath, outputResult);
-		Logger.LogInformation("Created overview for {count} decks", renderedDecks.Count());
+		Logger.LogInformation("Created overview for {count} decks", renderedDecks.Count);
 	}
 
-	private async Task<IEnumerable<string>> RenderDecks(List<(string deckName, List<(string title, string content)> cards)> decks, WrapperModel model, int? batchSize, bool generateImage, int bleedPixels, bool createBacks, CustomMarkdownParser parser, Template targetTemplate, string outputDirectory, Template cardTemplate) {
+	private async Task<IEnumerable<string>> RenderDecks(List<(string deckName, List<(string title, string content)> cards)> decks, DeckModel model, int? batchSize, bool generateImage, int bleedPixels, bool createBacks, CustomMarkdownParser parser, Template targetTemplate, string outputDirectory, Template cardTemplate) {
 		try {
 			var result = await Task.WhenAll(decks.Select(async deck => {
 				var batchType = batchSize switch {
@@ -106,7 +135,7 @@ public partial class Converter(
 					.Chunk(batchSize ?? deck.cards.Count)
 					.Select(async (batch, batchIndex) => {
 						model.cards = batch.Select(c => c.content).ToList();
-						var outputResult = await RenderWithModel(model, parser, targetTemplate);
+						var outputResult = await targetTemplate.RenderAsync(model);
 						var batchName = batchType switch {
 							BatchType.All => $"{deck.deckName}",
 							BatchType.Single => $"{deck.deckName} {FolderRepository.MakeValidFileName(batch.First().title)}",
@@ -132,6 +161,40 @@ public partial class Converter(
 			Logger.LogError("Writing output: {message}. Skipping.", ex.Message);
 			return [];
 		}
+	}
+
+	private async Task<List<(string deckName, List<(string title, string content)> cards)>>
+		RenderCards(Template template, string templateName, List<(string, Dictionary<string, string>)> rows, CustomMarkdownParser parser) {
+		var usedNames = new Dictionary<string, int>();
+		var decks = new DefaultValueDictionary<string, List<(string title, string content)>>(() => []);
+		try {
+			foreach (var (name, data) in rows) {
+				var title = name;
+				if (!usedNames.TryAdd(title, 1)) {
+					usedNames[title] += 1;
+					title = $"{title}_{usedNames[title]}";
+				}
+				var parsedData = data.ToDictionary(kv => kv.Key, kv => parser.Parse(kv.Value));
+				var scriptObject = parsedData.ToScriptObject(parser);
+				var result = await template.RenderAsync(scriptObject);
+				var copies = parsedData.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
+				var deckName = parsedData.GetValueOrDefault("Deck") ?? templateName;
+				Logger.LogDebug("Adding card {cardName} to deck {deckName}", title, deckName);
+				decks[deckName].AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));
+			}
+		}
+		catch (Exception ex) {
+			Logger.LogError("Parsing card data: {message}. Skipping.", ex.Message);
+		}
+		return decks.Select(kv => (kv.Key, kv.Value)).ToList();
+	}
+
+	private async Task CreateBacks(bool generateImage, int bleedPixels, CustomMarkdownParser parser, Template cardTemplate, DeckModel model, Template targetTemplate, string outputDirectory, string name) {
+		var backModel = new BackModel(parser) { deck = name };
+		var backCardResult = await cardTemplate.RenderAsync(backModel);
+		model.cards = new List<string> { backCardResult };
+		var backOutputResult = await targetTemplate.RenderAsync(model);
+		await CreateTarget(generateImage, bleedPixels, outputDirectory, $"{name} back", backOutputResult);
 	}
 
 	private Template GetTargetTemplate(string target) {
@@ -162,55 +225,12 @@ public partial class Converter(
 		return template;
 	}
 
-	private async Task<List<(string deckName, List<(string title, string content)> cards)>>
-		RenderCards(Template template, string templateName, string cardData, CustomMarkdownParser parser) {
-		var usedNames = new Dictionary<string, int>();
-		var decks = new DefaultValueDictionary<string, List<(string title, string content)>>(() => []);
-		using var reader = Sep.Reader(o => o with { Unescape = true}).FromFile(cardData);
-		try {
-			foreach (var (data, title) in reader.Enumerate(row => {
-					if (row.Span.Length == 0 || row.Span.StartsWith("//"))
-						return (new(), "");
-					var title = row[0].ToString();
-					if (!usedNames.TryAdd(title, 1)) {
-						usedNames[title] += 1;
-						title = $"{title}_{usedNames[title]}";
-					}
-					var dict = new Dictionary<string, string>();
-					foreach (var header in reader.Header.ColNames)
-						dict[header] = parser.Parse(row[header].ToString());
-					return (dict, title);
-				}).Where(d => d.dict.Count != 0)) {
-				var scriptObject = new ScriptObject();
-				scriptObject.Import(data);
-				scriptObject.Import("md", new Func<string, string>(parser.Parse));
-				var result = await template.RenderAsync(scriptObject);
-				var copies = data.TryGetValue("Copies", out var s) && int.TryParse(s, out var c) ? c : 1;
-				var deckName = data.GetValueOrDefault("Deck") ?? templateName;
-				Logger.LogDebug("Adding card {cardName} to deck {deckName}", title, deckName);
-				decks[deckName].AddRange(Enumerable.Range(0, copies).Select(_ => (title, result)));
-			}
-		}
-		catch (Exception ex) {
-			Logger.LogError("Parsing card data: {message}. Skipping.", ex.Message);
-		}
-		return decks.Select(kv => (kv.Key, kv.Value)).ToList();
-	}
-
 	private async Task<string> CreateTarget(bool generateImage, int bleedPixels, string outputDirectory, string deckName, string outputResult) {
 		var outputPath = Path.Combine(outputDirectory, $"{deckName}.html");
 		await WriteTarget(outputPath, outputResult);
 		if (generateImage)
 			await GenerateImage(outputPath, outputDirectory, deckName, bleedPixels);
 		return outputPath;
-	}
-
-	private static async Task<string> RenderWithModel(WrapperModel model, CustomMarkdownParser parser, Template targetTemplate) {
-		var scriptObject = new ScriptObject();
-		scriptObject.Import(model);
-		scriptObject.Import("md", new Func<string, string>(parser.Parse));
-		var outputResult = await targetTemplate.RenderAsync(scriptObject);
-		return outputResult;
 	}
 
 	private static async Task WriteTarget(string outputPath, string outputResult) {
@@ -282,88 +302,67 @@ public partial class Converter(
 	}
 
 	private void WatchFiles(string target, string? type, int? batchSize, bool image, int bleedPixels, bool createBacks, bool overview) {
-		var cardsWatcher = type != null
-			? new FileSystemWatcher { Filters = { $"{target}.csv", $"{target}.html", $"{target}.css" } }
-			: new FileSystemWatcher { Filters = { "*.csv", "*.html", "*.css" } };
-		cardsWatcher.Path = FolderRepository.GetCardsDirectory();
-		cardsWatcher.EnableRaisingEvents = true;
-		var cardsEvents = Observable
-			.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
-				h => cardsWatcher.Changed += h,
-				h => cardsWatcher.Changed -= h)
-			.Select(e => e.EventArgs);
+		var cardsWatcher = new FileSystemWatcher {
+			Path = FolderRepository.GetCardsDirectory(),
+			EnableRaisingEvents = true
+		};
+		string[] extensions = ["csv", "html", "css", "ods"];
+		foreach (var filter in extensions
+			.Select(ext => type == null ? $"*.{ext}" : $"{target}.{ext}")) {
+			cardsWatcher.Filters.Add(filter);
+		}
 
 		var targetWatcher = new FileSystemWatcher {
 			Path = FolderRepository.GetTargetDirectory(),
 			EnableRaisingEvents = true,
 			Filters = { $"{target}.html", "global.css" }
 		};
+
+		var cardsEvents = Observable
+			.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
+				h => {
+					cardsWatcher.Changed += h;
+					cardsWatcher.Created += h;
+					cardsWatcher.Deleted += h;
+				},
+				h => {
+					cardsWatcher.Changed -= h;
+					cardsWatcher.Created -= h;
+					cardsWatcher.Deleted -= h;
+				})
+			.Select(e => e.EventArgs);
+		var cardsRenameEvents = Observable
+			.FromEventPattern<RenamedEventHandler, RenamedEventArgs>(
+				h => cardsWatcher.Renamed += h,
+				h => cardsWatcher.Renamed -= h)
+			.Select(e => e.EventArgs);
 		var targetEvents = Observable
 			.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
-				h => targetWatcher.Changed += h,
-				h => targetWatcher.Changed -= h)
+				h => {
+					targetWatcher.Changed += h;
+					targetWatcher.Created += h;
+					targetWatcher.Deleted += h;
+				},
+				h => {
+					targetWatcher.Changed -= h;
+					targetWatcher.Created -= h;
+					targetWatcher.Deleted -= h;
+				}
+			).Select(e => e.EventArgs);
+		var targetRenameEvents = Observable
+			.FromEventPattern<RenamedEventHandler, RenamedEventArgs>(
+				h => targetWatcher.Renamed += h,
+				h => targetWatcher.Renamed -= h)
 			.Select(e => e.EventArgs);
 
-		var observable = cardsEvents.Merge(targetEvents);
+		var observable = cardsEvents.Merge(cardsRenameEvents).Merge(targetEvents).Merge(targetRenameEvents);
 		observable.Throttle(TimeSpan.FromMilliseconds(200)).Subscribe(arg => {
 			Logger.LogDebug("File changed: {path}", arg.FullPath);
+			OdsReader.ClearCache();
 			Convert(target, type, batchSize, bleedPixels == 0 ? null : $"{bleedPixels}px", image, false, createBacks, overview).Wait();
-		Logger.LogSuccess("Still watching. Press q to quit.");
+			Logger.LogSuccess("Still watching. Press q to quit.");
 		});
 		Logger.LogSuccess("Watching files. Press q to quit.");
 		while (Console.ReadKey().KeyChar != 'q') {}
 	}
-
-	private async Task CreateBacks(bool generateImage, int bleedPixels, CustomMarkdownParser parser, Template cardTemplate, WrapperModel model, Template targetTemplate, string outputDirectory, string name) {
-		var backContent = new ScriptObject();
-		backContent.Import("md", new Func<string, string>(parser.Parse));
-		backContent["Deck"] = name;
-		var backCardResult = await cardTemplate.RenderAsync(backContent);
-		model.cards = new List<string> { backCardResult };
-		var backOutputResult = await RenderWithModel(model, parser, targetTemplate);
-		await CreateTarget(generateImage, bleedPixels, outputDirectory, $"{name} back", backOutputResult);
-	}
-
-	private int GetBleedPixels(string? bleed) {
-		if (bleed == null)
-			return 0;
-		var match = BleedRegex().Match(bleed);
-		if (!match.Success)
-			throw new Exception("Invalid bleed value");
-		var bleedValue = int.Parse(match.Groups[1].Value);
-		if (bleedValue < 0)
-			throw new Exception("Bleed value cannot be < 0");
-		var bleedUnit = match.Groups[2].Value;
-		var bleedPixels = System.Convert.ToInt32(bleedUnit switch {
-			"px" => bleedValue,
-			"mm" => bleedValue * 3.7795275591,
-			"cm" => bleedValue * 37.795275591,
-			"in" => bleedValue * 90,
-			"pt" => bleedValue * 1.3333333333,
-			"pc" => bleedValue * 16,
-			_ => throw new Exception($"Unknown bleed unit: {bleedUnit}")
-		});
-		Logger.LogDebug("Bleed value: {bleedValue}", bleedValue);
-		return bleedPixels;
-	}
-
-	[SuppressMessage("ReSharper", "InconsistentNaming")]
-	[SuppressMessage("ReSharper", "IdentifierTypo")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
-	private class WrapperModel {
-		public string name { get; set; } = "";
-		public IList<string> cards { get; set; } = new List<string>();
-		public string cardtypecss { get; set; } = "";
-		public string globaltargetcss { get; set; } = "";
-		public IList<string> scripts { get; set; } = new List<string>();
-	}
-
-	private enum BatchType {
-		All,
-		Single,
-		Batch
-	}
-
-    [GeneratedRegex(@"(\d+)\s*(\D+)")]
-    private static partial Regex BleedRegex();
 }
