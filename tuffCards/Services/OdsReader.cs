@@ -5,19 +5,8 @@ using tuffLib.Functional;
 
 namespace tuffCards.Services;
 
-public class OdsReader {
-	private readonly Dictionary<string, OdsDocument> DocumentCache = new();
-
-	public OdsDocument GetDocument(string path) {
-		if (DocumentCache.TryGetValue(path, out var doc)) {
-			return doc;
-		}
-		var newDoc = LoadDocument(path);
-		DocumentCache[path] = newDoc;
-		return newDoc;
-	}
-
-	private static OdsDocument LoadDocument(string path) {
+public class OdsReader : TableReader {
+	protected override ITableDocument LoadDocument(string path) {
 		if (!File.Exists(path))
 			throw new FileNotFoundException($"The file at '{path}' does not exist.");
 
@@ -30,13 +19,9 @@ public class OdsReader {
 		document.Load(contentStream);
 		return new OdsDocument(document);
 	}
-
-	public void ClearCache() {
-		DocumentCache.Clear();
-	}
 }
 
-public class OdsDocument {
+public class OdsDocument : ITableDocument {
 	private readonly Dictionary<string, XmlNode> Sheets;
 
 	public OdsDocument(XmlDocument document) {
@@ -48,26 +33,29 @@ public class OdsDocument {
 			.ToDictionary(t => t.name!, t => t.node);
 	}
 
-	public List<string> GetSheetNames() {
-		return Sheets.Keys.ToList();
+	public IEnumerable<string> GetSheetNames() {
+		return Sheets.Keys;
 	}
 
-	public List<OdsSheet> GetAllSheets() {
+	public IEnumerable<ITableSheet> GetAllSheets() {
 		return Sheets.Values.Select(s => new OdsSheet(s)).ToList();
 	}
 
-	public OdsSheet? GetSheet(string name) {
+	public ITableSheet? GetSheet(string name) {
 		return Sheets.GetValueOrDefault(name)?.Apply(s => new OdsSheet(s));
 	}
 }
 
-public class OdsSheet {
+public class OdsSheet : ITableSheet {
 	private readonly List<List<string>> Rows;
 
 	public OdsSheet(XmlNode sheet) {
 		Rows = sheet.ChildNodes
 			.OfType<XmlNode>()
 			.Where(row => row.Name == "table:table-row")
+			.SelectMany(row => int.TryParse(row.Attributes?["table:number-rows-repeated"]?.Value, out var count)
+				? Enumerable.Repeat(row, count)
+				: [row])
 			.Select(row => row.ChildNodes.OfType<XmlNode>().Where(cell => cell.Name == "table:table-cell"))
 			.Where(row => row.Any())
 			.Select(row => row
@@ -83,21 +71,19 @@ public class OdsSheet {
 			.ToList();
 	}
 
-	public List<List<string>> GetRows() {
+	public IEnumerable<List<string>> GetRows() {
 		return Rows;
 	}
 
-	public List<(string name, Dictionary<string, string> data)> GetContentAsDictionary() {
+	public IEnumerable<(string name, Dictionary<string, string> data)> GetContentAsDictionary() {
 		return Rows
 			.Skip(1)
 			.Select(row => (
-				row.FirstOrDefault() ?? string.Empty,
-				row
-					.ZipLongest(Rows[0], (value, header) => (value, header))
-					.Where(t => t.header != null)
-					.ToDictionary(t => t.header!, t => t.value ?? string.Empty)
+					row.FirstOrDefault() ?? string.Empty,
+					row.ZipLongest(Rows[0], (value, header) => (value, header))
+						.Where(t => t.header != null)
+						.ToDictionary(t => t.header!, t => t.value ?? string.Empty)
 				)
-			)
-			.ToList();
+			);
 	}
 }

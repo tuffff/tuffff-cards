@@ -17,6 +17,7 @@ public static class Program {
 		var overviewArg = new Option<bool>("--overview", () => false, "Create an overview file with the target name in the output folder.");
 		var watchFilesArg = new Option<bool>("--watch", () => false, "Watches all used input files and starts another completion on changes.");
 		var forceArg = new Option<bool>("--force", () => false, "Force the command, ignore warnings.");
+		var openFilesArg = new Option<bool>("--open-files", () => false, "Automatically open the generated files or the overview file.");
 		var logLevelArg = new Option<LogLevel>("--log-level", () => LogLevel.Information, "Sets the log level.");
 		var cardTypeNameArg = new Argument<string>("name", "The name of the card type (also the file name).");
 
@@ -32,6 +33,7 @@ public static class Program {
 			watchFilesArg,
 			createBacksArg,
 			overviewArg,
+			openFilesArg,
 			logLevelArg
 		};
 		root.AddCommand(convertCmd);
@@ -44,8 +46,9 @@ public static class Program {
 			var watchFiles = context.ParseResult.GetValueForOption(watchFilesArg);
 			var createBacks = context.ParseResult.GetValueForOption(createBacksArg);
 			var overview = context.ParseResult.GetValueForOption(overviewArg);
+			var openFiles = context.ParseResult.GetValueForOption(openFilesArg);
 			var logLevel = context.ParseResult.GetValueForOption(logLevelArg);
-			await GetServices(logLevel).GetRequiredService<Converter>().Convert(target, cardType, batchSize, bleed, generateImage, watchFiles, createBacks, overview);
+			await GetServices(logLevel).GetRequiredService<Converter>().Convert(target, cardType, batchSize, bleed, generateImage, watchFiles, createBacks, overview, openFiles);
 		});
 
 		var createCmd = new Command("create", "Creates a new, relatively empty project in this folder.") {
@@ -86,8 +89,9 @@ public static class Program {
 			.AddScoped<Converter>()
 			.AddScoped<Creator>()
 			.AddScoped<MarkdownParserFactory>()
+			.AddScoped<CsvReader>()
 			.AddScoped<OdsReader>()
-			.AddSingleton<CsvReader>()
+			.AddScoped<XlsxReader>()
 			.AddSingleton<BrowserService>()
 			.AddScoped(_ => new FolderRepository(Directory.GetCurrentDirectory()))
 			.BuildServiceProvider();

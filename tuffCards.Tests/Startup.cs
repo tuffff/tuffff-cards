@@ -21,6 +21,7 @@ public static class Startup {
 			.AddScoped<MarkdownParserFactory>()
 			.AddScoped<OdsReader>()
 			.AddScoped<CsvReader>()
+			.AddScoped<XlsxReader>()
 			.AddScoped(_ => new FolderRepository(Directory.GetCurrentDirectory()))
 			.AddScoped<TemporaryDirectoryFactory>();
 	}

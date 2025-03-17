@@ -1,4 +1,5 @@
 using PuppeteerSharp;
+using System.Diagnostics;
 using System.Reactive.Linq;
 using tuffCards.Commands.ConverterModels;
 using tuffCards.Presets;
@@ -13,9 +14,10 @@ public class Converter(
 	ILogger<Converter> Logger,
 	BrowserService BrowserService,
 	CsvReader CsvReader,
-	OdsReader OdsReader) {
+	OdsReader OdsReader,
+	XlsxReader XlsxReader) {
 
-	public async Task Convert(string target, string? type, int? batchSize, string? bleed, bool generateImage, bool watchFiles, bool createBacks, bool overview) {
+	public async Task Convert(string target, string? type, int? batchSize, string? bleed, bool generateImage, bool watchFiles, bool createBacks, bool overview, bool openFiles) {
 		try {
 			if (batchSize is < 1) {
 				throw new Exception("Batch size cannot be < 1");
@@ -68,11 +70,13 @@ public class Converter(
 					scripts = scripts,
 				};
 
-				decksNames.AddRange(await RenderDecks(decks, model, batchSize, generateImage, bleedPixels, createBacks, parser, targetTemplate, outputDirectory, cardTemplate));
+				decksNames.AddRange(
+					await RenderDecks(decks, model, batchSize, generateImage, bleedPixels, createBacks, parser, targetTemplate, outputDirectory, cardTemplate, overview, openFiles)
+				);
 			}
 
 			if (overview)
-				await RenderOverview(decksNames, target);
+				await RenderOverview(decksNames, target, openFiles);
 
 			Logger.LogSuccess("Finished.");
 
@@ -85,33 +89,30 @@ public class Converter(
 	}
 
 	private (List<(string name, Dictionary<string, string> data)> data, string path)? FindData(string templatePath, string templateName) {
-		var cardDataPath = Path.Combine(templatePath, $"{templateName}.csv");
-		if (File.Exists(cardDataPath)) {
-			var data = CsvReader.GetData(cardDataPath);
-			return (data, cardDataPath);
-		}
-		cardDataPath = Path.Combine(templatePath, $"{templateName}.ods");
-		if (File.Exists(cardDataPath)) {
-			var document = OdsReader.GetDocument(cardDataPath);
-			var data = document
-				.GetAllSheets()
-				.SelectMany(s => s.GetContentAsDictionary())
-				.ToList();
-			return (data, cardDataPath);
-		}
-		cardDataPath = Path.Combine(templatePath, "data.ods");
-		if (File.Exists(cardDataPath)) {
-			var document = OdsReader.GetDocument(cardDataPath);
-			var sheet = document.GetSheet(templateName);
-			if (sheet != null) {
-				var data = sheet.GetContentAsDictionary();
-				return (data, cardDataPath);
+		foreach (var option in new List<(string filename, Func<string, List<(string name, Dictionary<string, string> data)>> handler)> {
+				($"{templateName}.csv", CsvReader.GetData),
+				($"{templateName}.ods", path => GetAllData(OdsReader.GetDocument(path))),
+				($"{templateName}.xlsx", path => GetAllData(XlsxReader.GetDocument(path))),
+				("data.ods", path => GetSheetData(OdsReader.GetDocument(path))),
+				("data.xlsx", path => GetSheetData(XlsxReader.GetDocument(path)))
+			}) {
+			var cardDataPath = Path.Combine(templatePath, option.filename);
+			if (File.Exists(cardDataPath)) {
+				return (option.handler(cardDataPath), cardDataPath);
 			}
 		}
 		return null;
+
+		List<(string name, Dictionary<string, string> data)> GetSheetData(ITableDocument document) {
+			return document.GetSheet(templateName)?.GetContentAsDictionary().ToList() ?? [];
+		}
+
+		List<(string name, Dictionary<string, string> data)> GetAllData(ITableDocument document) {
+			return document.GetAllSheets().SelectMany(s => s.GetContentAsDictionary()).ToList();
+		}
 	}
 
-	private async Task RenderOverview(List<string> renderedDecks, string target) {
+	private async Task RenderOverview(List<string> renderedDecks, string target, bool openFile) {
 		var outputPath = Path.Combine(FolderRepository.GetOutputRootDirectory(), $"{target}.html");
 		var template = Template.Parse(Defaults.Overview);
 		var model = new OverviewModel {
@@ -119,11 +120,11 @@ public class Converter(
 			target = target
 		};
 		var outputResult = await template.RenderAsync(model);
-		await WriteTarget(outputPath, outputResult);
+		await WriteTarget(outputPath, outputResult, openFile);
 		Logger.LogInformation("Created overview for {count} decks", renderedDecks.Count);
 	}
 
-	private async Task<IEnumerable<string>> RenderDecks(List<(string deckName, List<(string title, string content)> cards)> decks, DeckModel model, int? batchSize, bool generateImage, int bleedPixels, bool createBacks, CustomMarkdownParser parser, Template targetTemplate, string outputDirectory, Template cardTemplate) {
+	private async Task<IEnumerable<string>> RenderDecks(List<(string deckName, List<(string title, string content)> cards)> decks, DeckModel model, int? batchSize, bool generateImage, int bleedPixels, bool createBacks, CustomMarkdownParser parser, Template targetTemplate, string outputDirectory, Template cardTemplate, bool generateOverview, bool openFile) {
 		try {
 			var result = await Task.WhenAll(decks.Select(async deck => {
 				var batchType = batchSize switch {
@@ -141,7 +142,7 @@ public class Converter(
 							BatchType.Single => $"{deck.deckName} {FolderRepository.MakeValidFileName(batch.First().title)}",
 							_ => $"{deck.deckName} {batchIndex}"
 						};
-						var outputPath = await CreateTarget(generateImage, bleedPixels, outputDirectory, batchName, outputResult);
+						var outputPath = await CreateTarget(generateImage, bleedPixels, outputDirectory, batchName, outputResult, openFile && !generateOverview);
 						if (batchType != BatchType.All)
 							Logger.LogDebug("Created {count} card(s): {outputPath}", batch.Length, outputPath);
 						return batchName;
@@ -194,7 +195,7 @@ public class Converter(
 		var backCardResult = await cardTemplate.RenderAsync(backModel);
 		model.cards = new List<string> { backCardResult };
 		var backOutputResult = await targetTemplate.RenderAsync(model);
-		await CreateTarget(generateImage, bleedPixels, outputDirectory, $"{name} back", backOutputResult);
+		await CreateTarget(generateImage, bleedPixels, outputDirectory, $"{name} back", backOutputResult, false);
 	}
 
 	private Template GetTargetTemplate(string target) {
@@ -225,17 +226,29 @@ public class Converter(
 		return template;
 	}
 
-	private async Task<string> CreateTarget(bool generateImage, int bleedPixels, string outputDirectory, string deckName, string outputResult) {
+	private async Task<string> CreateTarget(bool generateImage, int bleedPixels, string outputDirectory, string deckName, string outputResult, bool openFile) {
 		var outputPath = Path.Combine(outputDirectory, $"{deckName}.html");
-		await WriteTarget(outputPath, outputResult);
+		await WriteTarget(outputPath, outputResult, openFile);
 		if (generateImage)
 			await GenerateImage(outputPath, outputDirectory, deckName, bleedPixels);
 		return outputPath;
 	}
 
-	private static async Task WriteTarget(string outputPath, string outputResult) {
+	private async Task WriteTarget(string outputPath, string outputResult, bool openFile) {
 		await using var output = new StreamWriter(outputPath, false);
 		await output.WriteLineAsync(outputResult);
+		if (openFile) {
+			try {
+				var processStartInfo = new ProcessStartInfo {
+					FileName = outputPath,
+					UseShellExecute = true
+				};
+				Process.Start(processStartInfo);
+			}
+			catch (Exception ex) {
+				Logger.LogError("Error opening file: {message}", ex.Message);
+			}
+		}
 	}
 
 	private string GetGlobalTargetCss() {
@@ -359,7 +372,7 @@ public class Converter(
 		observable.Throttle(TimeSpan.FromMilliseconds(200)).Subscribe(arg => {
 			Logger.LogDebug("File changed: {path}", arg.FullPath);
 			OdsReader.ClearCache();
-			Convert(target, type, batchSize, bleedPixels == 0 ? null : $"{bleedPixels}px", image, false, createBacks, overview).Wait();
+			Convert(target, type, batchSize, bleedPixels == 0 ? null : $"{bleedPixels}px", image, false, createBacks, overview, false).Wait();
 			Logger.LogSuccess("Still watching. Press q to quit.");
 		});
 		Logger.LogSuccess("Watching files. Press q to quit.");
