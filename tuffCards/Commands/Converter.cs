@@ -1,10 +1,4 @@
 using PuppeteerSharp;
-using System.Diagnostics;
-using System.Reactive.Linq;
-using tuffCards.Commands.ConverterModels;
-using tuffCards.Presets;
-using tuffCards.Services;
-using tuffLib.Dictionaries;
 
 namespace tuffCards.Commands;
 

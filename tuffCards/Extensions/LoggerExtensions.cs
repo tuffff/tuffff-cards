@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace tuffCards.Extensions;
 
 [SuppressMessage("Usage", "CA2254:Template should be a static expression")]

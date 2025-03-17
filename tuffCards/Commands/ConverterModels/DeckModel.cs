@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace tuffCards.Commands.ConverterModels;
+﻿namespace tuffCards.Commands.ConverterModels;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

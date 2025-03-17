@@ -1,2 +1,11 @@
-global using Xunit;
 global using JetBrains.Annotations;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using System.Runtime.CompilerServices;
+global using tuffCards.Commands;
+global using tuffCards.Markdown;
+global using tuffCards.Services;
+global using tuffCards.Tests.Helpers;
+global using tuffLib.Functional;
+global using Xunit;
+global using Xunit.DependencyInjection.Logging;

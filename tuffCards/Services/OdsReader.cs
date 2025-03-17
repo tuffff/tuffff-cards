@@ -1,7 +1,5 @@
-﻿using MoreLinq.Extensions;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Xml;
-using tuffLib.Functional;
 
 namespace tuffCards.Services;
 

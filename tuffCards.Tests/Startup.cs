@@ -1,12 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using tuffCards.Commands;
-using tuffCards.Markdown;
-using tuffCards.Services;
-using tuffCards.Tests.Helpers;
-using Xunit.DependencyInjection.Logging;
-
-namespace tuffCards.Tests;
+﻿namespace tuffCards.Tests;
 
 public static class Startup {
 	public static void ConfigureServices(IServiceCollection services) {

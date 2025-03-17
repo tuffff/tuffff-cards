@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Runtime.CompilerServices;
-
-namespace tuffCards.Tests.Helpers;
+﻿namespace tuffCards.Tests.Helpers;
 
 public sealed class TemporaryDirectory : IDisposable {
 	private readonly ILogger<TemporaryDirectory> Logger;

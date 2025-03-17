@@ -1,7 +1,4 @@
-﻿using tuffCards.Markdown;
-using tuffCards.Services;
-
-namespace tuffCards.Tests.Unit;
+﻿namespace tuffCards.Tests.Unit;
 
 [Collection(Collections.UsesCwd)]
 public class CustomMarkdownParserTests(MarkdownParserFactory ParserFactory, FolderRepository FolderRepository) {

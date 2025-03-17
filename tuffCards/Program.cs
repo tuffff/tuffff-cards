@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.CommandLine;
-using tuffCards.Commands;
-using tuffCards.Services;
-
-namespace tuffCards;
+﻿namespace tuffCards;
 
 public static class Program {
 	public static async Task Main(string[] args) {

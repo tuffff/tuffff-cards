@@ -1,5 +1,3 @@
-using tuffCards.Services;
-
 namespace tuffCards.Commands;
 
 public class CardTypeAdder(FolderRepository FolderRepository, ILogger<CardTypeAdder> Logger) {

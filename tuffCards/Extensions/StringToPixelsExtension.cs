@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace tuffCards.Extensions;
+﻿namespace tuffCards.Extensions;
 
 public static partial class StringToPixelsExtension {
 	public static int ToPixels(this string? bleed) {
